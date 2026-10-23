@@ -2,6 +2,19 @@
 
 Newest first. One bullet per landed change; dates are ISO.
 
+## 2026-10-24
+
+- Independently audited all 115 research references and the SDK/MI planning
+  claims. The previous research is not execution-ready without the corrections
+  recorded in
+  [the dated audit](local/research/outputs/opxy-hardware-mi-research-audit-2026-10-24.md).
+  Current successors:
+  [research brief](local/research/outputs/opxy-hardware-mi-research-2026-10-24.md)
+  and [MI port plan](local/port-plan-2026-10-24.md).
+  Preserved the closed originals; restored original Tides/Tides2 eligibility,
+  corrected memory accounting and timing/oracle/recovery claims, and recovered
+  the FCC photo evidence. Runtime source and device state unchanged.
+
 ## 2026-10-23
 
 - Added fork router `AGENTS_WSZ.md`; appended a pointer section to `AGENTS.md`

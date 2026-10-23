@@ -27,8 +27,8 @@ to all shared code; this file only adds fork-specific conventions and pointers.
 |---|---|
 | `CHANGELOG.md` | what changed in this fork, newest first |
 | `WORKLOG.md` | dated session log (what happened, where it lives) |
-| `local/port-plan.md` | engine port plan: ABI constraints, candidate tiers, MI focus |
-| `local/research/` | deep-research corpus: hardware, Blackfin+ architecture, MI code, port precedents, brick-risk; protocol artifacts under `local/research/outputs/` |
+| `local/port-plan-2026-10-24.md` | current audited MI port plan; supersedes the historical `local/port-plan.md` |
+| `local/research/outputs/opxy-hardware-mi-research-audit-2026-10-24.md` | current verification verdict, corrected brief and evidence index; earlier corpus remains preserved under `local/research/` |
 | `../opxy_jailbreak/` | earlier firmware-access research (outside this checkout) |
 
 ## Log conventions

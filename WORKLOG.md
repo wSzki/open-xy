@@ -4,6 +4,30 @@ One entry per session, newest first. Findings and data live in dated files
 under `local/research/` or in `local/port-plan.md`; this file only records
 what happened and where the output landed.
 
+## 2026-10-24
+
+- Completed five independent verification slices covering SDK contracts,
+  MI DSP/memory, hardware/recovery, compiler/precedents and all 115 numbered
+  references. Lead adjudication and calculations are in
+  [the audit](local/research/outputs/opxy-hardware-mi-research-audit-2026-10-24.md);
+  detailed evidence and the source ledger are alongside it under `.drafts/`.
+- Use [the corrected brief](local/research/outputs/opxy-hardware-mi-research-2026-10-24.md)
+  and [the dated MI plan](local/port-plan-2026-10-24.md), not the closed
+  2026-10-23 versions, for current decisions. Peaks need not wait for a float
+  shim; original Tides is another integer/audio candidate; Tides2 is audio-capable.
+  Elements' identified resident storage is already 165,280 B before other
+  state, invalidating the old approximately 100-KiB full-module budget.
+- Recovered and parsed all seven pages of FCC exhibit 7769481 and inspected
+  the board images; no confident exact chip identification was possible.
+  Recovered the manufacturer BF706/BF707 memory-map page through a mirror:
+  current module linkage is in its external-DDR range, not L2 SRAM.
+- Ran `python3 sdk.py check`: 78 browser-labelled Node tests passed; each
+  Python run (normal and `-O`) discovered 113 tests, with 107 successful and
+  six private-package cases skipped. Saved raw process output under
+  `local/research/outputs/.drafts/audit-2026-10-24-sdk-check.log`.
+  Public checks passed; private/native release qualification, device timing,
+  listening and recovery were not performed. No firmware/device operations.
+
 ## 2026-10-23
 
 - Planned open-source engine ports for the OP-XY SDK: digested the machine ABI
