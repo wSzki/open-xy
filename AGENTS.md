@@ -33,3 +33,8 @@ must live outside every checkout, including ignored local/ directories. The
 docs use %LOCALAPPDATA%/OPXY-SDK/private/ (Windows) or
 ~/Library/Application Support/OPXY-SDK/private/ (macOS); pass external
 input/output paths to build commands. Never force-add these files or bypass the commit/push guards.
+
+## Fork (wSzki)
+
+Fork-specific conventions, workspace indexes and log pointers live in
+[AGENTS_WSZ.md](AGENTS_WSZ.md). Everything above still applies to fork work.

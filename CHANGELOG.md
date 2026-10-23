@@ -1,0 +1,29 @@
+# Changelog — wSzki fork of open-xy
+
+Newest first. One bullet per landed change; dates are ISO.
+
+## 2026-10-23
+
+- Added fork router `AGENTS_WSZ.md`; appended a pointer section to `AGENTS.md`
+  (the only fork edit to an upstream file).
+- Added `CHANGELOG.md` (this file) and `WORKLOG.md`; both indexed from
+  `AGENTS_WSZ.md`.
+- Port planning: machine-ABI constraints digest (BF707 no-FPU, 508 KiB shared
+  module region, effect State ≤ 476 B, mono Q31 synth voices, ≤8 controls),
+  candidate engine tiers with license sweep, and the Mutable Instruments focus.
+  Saved to `local/port-plan.md` (ignored tree, not committed).
+- Corrected the MI effort model after upstream verification: Plaits and Rings
+  are float DSP (Braids was the only int16/int32 MI module); MI ports are
+  float→Q31 rewrite campaigns. Reflected in `local/port-plan.md` §3.
+- Started the deep-research corpus at `local/research/` (OP-XY hardware,
+  Blackfin+/BF707 architecture, MI code audit, embedded port precedents,
+  brick-risk & recovery). Plan:
+  `local/research/outputs/.plans/opxy-hardware-mi-research.md`.
+
+- Deep-research corpus delivered at `local/research/outputs/`
+  (`opxy-hardware-mi-research.md` + provenance, 5 research notes, plan and
+  per-researcher briefs; 114 sources, verification PASS WITH NOTES). Port
+  plan updated accordingly: stmlib Q31 shim precedes the Peaks port; Edges
+  excluded (GPL-3.0 + ATxmega asm); Tides 2 reclassified as modulation engine;
+  Rings/Elements RAM budgets made concrete; te-boot recovery and
+  bootloader-security churn recorded.
