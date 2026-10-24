@@ -24,7 +24,8 @@ static const int32_t kAudioHalf = INT32_C(1) << 24;
 static const int32_t kGainOne = INT32_C(1) << 29;
 static const int32_t kPiQ16 = 205887;
 static const uint32_t kQ24One = UINT32_C(1) << 24;
-static const uint32_t kQ24Nyquist499 = (UINT32_C(499) * kQ24One) / UINT32_C(1000);
+static const uint32_t kQ24Nyquist499 = static_cast<uint32_t>(
+    (UINT64_C(499) * kQ24One) / UINT32_C(1000));
 static const uint64_t kFrequencyOne = UINT64_C(1) << 40;
 static const uint64_t kFrequencyNyquist499 =
     (kFrequencyOne * UINT64_C(499)) / UINT64_C(1000);
@@ -746,7 +747,7 @@ inline StringFilterTargets calculate_string_filter(StringBankState& string,
         multiply_unit(to_infinite, kUnitOne - fir_brightness, stats));
 
     const uint32_t target_q24 =
-        (UINT32_C(4999) * kQ24One) / UINT32_C(10000);
+        static_cast<uint32_t>((UINT64_C(4999) * kQ24One) / UINT32_C(10000));
     const int32_t current_q24 = q24_from_frequency(damping_frequency, stats);
     const int32_t difference_q24 = narrow_i32(
         sub_wide(target_q24, current_q24, stats), stats);

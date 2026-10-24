@@ -4,6 +4,7 @@ Newest first. One bullet per landed change; dates are ISO.
 
 ## 2026-10-24
 
+- Corrected overflowing Rings cutoff constants, restoring high-frequency string energy and the long-decay filter transition without gain compensation.
 - Made provisioning and maintaining `WORKLOG.md` and `CHANGELOG.md` an explicit fork convention.
 - Fixed lost fractional feedback in the Rings exciter DC blocker, removing an unintended string-model DC tail; updated the measured shared-resource declaration.
 - Added opt-in collection selection and native compile proof; defaults and profile/ABI remain unchanged. Collection path-escape coverage no longer depends on temporary directories being outside the checkout.

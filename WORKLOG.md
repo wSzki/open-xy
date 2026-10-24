@@ -85,6 +85,21 @@ what happened and where the output landed.
   under the strict write sandbox; no outside-write allowance was added.
 
 - Recorded the standing user convention: provision `WORKLOG.md` and `CHANGELOG.md` when absent, and maintain both throughout coding work. The same preference is retained for future projects.
+- Corrected both Q24 cutoff constant expressions by widening multiplication
+  before division. The real helper/source comparison now gives the intended
+  Nyquist clamp and high-cutoff SVF coefficient (g ≈6.86 rather than ≈0.96).
+  Evidence: `coeff-before-20261024-01/`, `coeff-after-20261024-02/` and
+  `model-core-20261024-11/` under the integer-validation directory. The latter
+  renders 384,000 frames under ASan/UBSan with all numeric counters zero.
+- The twelve-pair rerender (`audition/results-paired-48k-20261024-06/`) closes
+  the material sympathetic harmonic/level loss: bright/sustain whole-record
+  RMS differences are now −0.009/+0.079 dB, with the measured upper bands also
+  close to the original. Modal bright/sustain are approximately level-matched;
+  inharmonic defaults remain about 1–1.4 dB lower. No gain fitting or lookup
+  alteration was made, and human audition is still separate. Strict callback
+  normal/ASan+UBSan checks pass with zero normal-run allocations
+  (`callbacks/callback-run-20261024-07/`); the separate preview `-06` passes
+  fixed-memory/ABI/ownership/drawing checks. Live preview `-05` is untouched.
 
 - Ran `python3 sdk.py check`: 78 browser-labelled Node tests passed; each
   Python run (normal and `-O`) discovered 113 tests, with 107 successful and
