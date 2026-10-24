@@ -249,10 +249,14 @@ inline void process_svf(SvfState& filter, Audio input, Audio* bandpass,
       kick_lp_q31 * (INT64_C(1) << 25u), stats);
   const Audio lp = narrow_i32(round_shift(lp_q56, 31u, stats), stats);
 
-  const int64_t new_s1 = sub_wide(add_wide(bp, bp, stats), filter.s1, stats);
-  const int64_t new_s2 = sub_wide(add_wide(lp, lp, stats), filter.s2, stats);
-  filter.s1 = narrow_i32(new_s1, stats);
-  filter.s2 = narrow_i32(new_s2, stats);
+  const int64_t new_s1_q30 = sub_wide(
+      bp_q56,
+      static_cast<int64_t>(filter.s1) * (INT64_C(1) << 30u), stats);
+  const int64_t new_s2_q30 = sub_wide(
+      lp_q56,
+      static_cast<int64_t>(filter.s2) * (INT64_C(1) << 30u), stats);
+  filter.s1 = narrow_i32(round_shift(new_s1_q30, 30u, stats), stats);
+  filter.s2 = narrow_i32(round_shift(new_s2_q30, 30u, stats), stats);
 
   if (bandpass != 0) {
     *bandpass = bp;
