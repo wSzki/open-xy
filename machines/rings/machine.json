@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "synth",
+  "description": "A fixed-point, Rings-inspired resonator with modal, sympathetic and inharmonic models.",
+  "identity": {
+    "engine": 1,
+    "page": 84
+  },
+  "sources": [
+    "model.cpp",
+    "tables.cpp"
+  ],
+  "includes": []
+}

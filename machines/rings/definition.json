@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "rings",
+  "name": "Rings",
+  "parameters": [
+    { "id": "structure", "label": "Struct", "default": 0.25, "mapping": { "kind": "linear", "minimum": 0, "maximum": 1 }, "display": "percent" },
+    { "id": "brightness", "label": "Bright", "default": 0.5, "mapping": { "kind": "linear", "minimum": 0, "maximum": 1 }, "display": "percent" },
+    { "id": "damping", "label": "Damping", "default": 0.3, "mapping": { "kind": "linear", "minimum": 0, "maximum": 1 }, "display": "percent" },
+    { "id": "position", "label": "Position", "default": 0.25, "mapping": { "kind": "linear", "minimum": 0, "maximum": 1 }, "display": "percent" },
+    { "id": "model", "label": "Model", "control": 0, "default": 0, "mapping": { "kind": "enum", "labels": ["modal", "sympath", "inharm"] }, "display": "enum" },
+    { "id": "output", "label": "Output", "control": 1, "default": 0.5, "mapping": { "kind": "enum", "labels": ["out", "mix", "aux"] }, "display": "enum" }
+  ],
+  "presets": {
+    "Modal": { "structure": 0.25, "brightness": 0.5, "damping": 0.3, "position": 0.25, "model": 0, "output": 0.5 },
+    "Sympathetic": { "structure": 0.25, "brightness": 0.5, "damping": 0.3, "position": 0.25, "model": 0.5, "output": 0.5 },
+    "Inharmonic": { "structure": 0.25, "brightness": 0.5, "damping": 0.3, "position": 0.25, "model": 1, "output": 0.5 }
+  },
+  "resources": {
+    "voiceBytes": 8,
+    "voiceAlignment": 4,
+    "voiceCapacity": 256,
+    "sharedBytes": 226904,
+    "outputPeakQ31": 1073741823,
+    "display": { "kind": "segments", "characters": 4, "glow": 0, "dials": 4, "textControls": [0, 1] }
+  }
+}
