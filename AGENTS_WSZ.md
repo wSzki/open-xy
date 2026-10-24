@@ -37,6 +37,10 @@ to all shared code; this file only adds fork-specific conventions and pointers.
   the outer sandbox invocation with the evidence; do not use bare compiler calls.
 - Run `python sdk.py check` for every change; checks must stay active under
   `python -O`.
+- For the concise local preview/check loop and supported Make overrides, see
+  [Make shortcuts](docs/preview.md#make-shortcuts). The default `make` only
+  serves an existing preview; it never builds one implicitly.
+
 
 ## Pointers
 

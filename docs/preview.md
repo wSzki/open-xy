@@ -22,6 +22,19 @@ server port is occupied. Open http://127.0.0.1:8917/, enable audio, then play
 `A W S E D F T G Y H U J K` or the on-screen keyboard. Escape/Stop all and loss
 of window focus release notes. Monitor gain is separate from engine parameters.
 
+## Make shortcuts
+
+Plain `make` (or `make run`) serves the latest already-built
+`local/$(ENGINE)-preview-*` snapshot; `ENGINE` defaults to `rings` and `PORT`
+to `8917`. It does not build implicitly.
+
+`make preview` creates a fresh WASM preview using the installed toolchain; it
+refuses an existing output directory. `make check` runs `sdk.py check`, and
+`make help` lists the commands. Override `ENGINE`, `PREVIEW`, `PREVIEW_DIR`,
+`PORT`, `PYTHON` or `WASM_CXX` as needed. Preview build checks include the
+SDK's ABI, fixed-memory, ownership and drawing checks.
+
+
 ## MIDI input
 
 Enable audio with the existing audio button, then choose **Connect MIDI input**

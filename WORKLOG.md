@@ -6,6 +6,14 @@ what happened and where the output landed.
 
 ## 2026-10-24
 
+- Added Make shortcuts in `docs/preview.md` and linked them from the fork
+  development rules. The observed default `make` launched the existing Rings
+  preview on port 8917; `make preview` built
+  `local/rings-preview-20261024-214012` and passed SDK WASM/ABI/fixed-memory/
+  ownership/drawing checks. Missing `PREVIEW` and existing `PREVIEW_DIR`
+  were rejected (exit 2). Direct CLT `make check` passed all 88 Node tests
+  and ran 120 Python tests per normal/`-O` run (six private skips per run);
+  raw evidence: `local/rings-night-001/midi-validation/make-final-public-check.json`.
 - Completed five independent verification slices covering SDK contracts,
   MI DSP/memory, hardware/recovery, compiler/precedents and all 115 numbered
   references. Lead adjudication and calculations are in
