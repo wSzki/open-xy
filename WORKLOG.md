@@ -55,6 +55,24 @@ what happened and where the output landed.
   screenshots `ui-lcd-tuned-rest/plucked/mobile.png`), non-Rings renderer
   parity and the full public check (88 Node; 120 Python per run, six skips)
   all pass.
+- Remapped the strings to the controls and re-tied motion to the sound after
+  the user clarified "relative to audio decay": vibration speed rose to
+  12–30 Hz (was 3–13) with unchanged pluck strength, and visible ring-out now
+  tracks the preview's audible window (note + 120 ms release): ~0.18 s at
+  Damping 0 to ~0.6 s at Damping 1 (rate 5700 − damping·4000/1024), instead
+  of the previous 0.45–1.3 s that outlasted short notes. Strings sit
+  horizontal at Structure 0 and tilt with Structure; Brightness picks one of
+  three stroke widths (0.35/0.55/0.85) and Damping one of five shades
+  (white #F4F6F6 → dark grey #4B5454) through a 15-entry palette; Position
+  spaces the group (gap 18–46 native px). `Frame<3,32,3,15>`, state 44 B
+  (slope cache restored). Fresh preview `local/rings-preview-20261025-014018`
+  (WASM `a35592a8…95510`) passed SDK preview checks;
+  `ui-display-smoke-horizontal.json` (4,267 frames, bounds x 130–350 /
+  y 36–204, decay 224/672 Q10) and `ui-browser-acceptance-horizontal.json`
+  (flatness 0 → tilt 39, stroke 0.35 → 0.85, #F4F6F6 → #4B5454, gap
+  36 → 90, ring-out 200 ms at defaults, screenshots
+  `ui-lcd-horizontal-rest/plucked.png`) pass; full public check rerun
+  (`ui-public-check-horizontal.json`). No device or listening claim.
 
 ## 2026-10-24
 

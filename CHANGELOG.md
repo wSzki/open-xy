@@ -11,6 +11,11 @@ Newest first. One bullet per landed change; dates are ISO.
   diagonals (no doubled blurry edge), visible ring-out shortened to stay inside
   the audible decay, and the browser top row restyled as the stock stepped
   header. DisplayState shrank to 40 B.
+- Remapped the Rings strings to the controls per audition feedback: horizontal
+  at Structure 0 with Structure tilt, Brightness stroke width, Damping shade
+  (white → dark grey via a 15-entry palette), Position spacing; vibration
+  speeded to 12–30 Hz and ring-out cut to the preview's audible window
+  (~0.2–0.65 s). State is 44 B with the slope cache restored.
 - Raised only the visible Rings monitor gain (default 2.6, max 4, about
   +12 dB over the old 0.65); DSP and output routing unchanged. Evidence in
   `local/rings-night-001/` and the worklog.
