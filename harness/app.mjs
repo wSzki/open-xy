@@ -22,6 +22,7 @@ import { renderScreen as renderBase } from './screen.mjs';
 import { PreviewDisplay, SvgDisplay } from '../sdk/browser/display.mjs';
 
 import { SegmentDisplay, SegmentSvg } from '../sdk/browser/segments.mjs';
+import { createMidiInput } from './midi-input.mjs';
 const segmented = previewManifest.graphics?.kind === 'segments';
 const renderScreen = (...args) => renderBase(...args, controls, segmented, shown);
 const $ = id => document.getElementById(id);
@@ -41,7 +42,7 @@ if (customPreview) {
 let values = defaults(), view = VIEWS[0], octave = 3, shown = [0, 1, 2, 3];
 let visualNotes = 0, display = null, scene = null, displayBackend = null;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-let context, processor, gain, analyser, samples, starting;
+let context, processor, gain, analyser, samples, starting, midiInput;
 let audioBackend = null;
 const parameterWords = () => q31(values);
 const held = new Map(), timers = new Set();
@@ -194,11 +195,56 @@ function noteOff(source) {
   paintKeys();
 }
 function panic() {
+  midiInput?.releaseNotes();
   for (const timer of timers) clearTimeout(timer);
   timers.clear(); held.clear(); send({ type: 'panic' });
   display?.reset(); draw();
   paintKeys(); $('phrase').textContent = 'Play phrase';
 }
+function renderMidiState(state) {
+  const select = $('midi-device');
+  const selectedId = state.selectedId;
+  const placeholder = new Option('Select an input…', '');
+  placeholder.disabled = true;
+  select.replaceChildren(placeholder);
+  for (const input of state.inputs) {
+    const option = new Option(input.name, input.id);
+    select.append(option);
+  }
+  select.value = selectedId;
+  select.disabled = !state.enabled || state.inputs.length === 0 || state.busy;
+  $('midi-connect').disabled = state.busy || (!state.enabled && !(window.isSecureContext && navigator.requestMIDIAccess));
+  $('midi-connect').textContent = state.enabled ? 'Disconnect MIDI' : 'Connect MIDI input';
+  let message = state.error ? `${state.error} Check this site’s MIDI permission and the input connection, then try again.` : '';
+  if (!message && state.busy) message = 'Updating MIDI connection…';
+  else if (!message && !window.isSecureContext) message = 'MIDI input requires a secure browser context. Use http://127.0.0.1 for local preview.';
+  else if (!message && !navigator.requestMIDIAccess) message = 'This browser does not support Web MIDI. The on-screen and computer keyboards remain available.';
+  else if (!message && !state.enabled) message = 'MIDI input is optional. Connect to request permission, then choose a keyboard.';
+  else if (!message && !state.inputs.length) message = 'No MIDI inputs are available. Connect a keyboard, then choose it here.';
+  else if (!message && selectedId) message = 'MIDI input ready. Enable audio separately, then play.';
+  else if (!message) message = 'Choose a MIDI input. No device is selected automatically.';
+  $('midi-status').textContent = message;
+}
+midiInput = createMidiInput({
+  requestAccess: options => navigator.requestMIDIAccess(options),
+  noteOn,
+  noteOff,
+  onStateChange: renderMidiState
+});
+renderMidiState(midiInput.getState());
+$('midi-connect').addEventListener('click', async () => {
+  if (midiInput.getState().enabled) await midiInput.disconnect();
+  else await midiInput.connect();
+  renderMidiState(midiInput.getState());
+});
+$('midi-device').addEventListener('change', async () => {
+  await midiInput.selectInput($('midi-device').value);
+  renderMidiState(midiInput.getState());
+});
+window.addEventListener('pagehide', () => {
+  panic();
+  void midiInput.disconnect();
+});
 for (const [i, key] of keys.entries()) {
   const button = document.createElement('button');
   button.id = `key-${i}`; button.className = `key ${black.has(i) ? 'black' : 'white'}`;

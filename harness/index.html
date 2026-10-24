@@ -8,6 +8,11 @@
   <div class="workspace">
     <section class="instrument" aria-label="Instrument">
       <div class="instrument-top"><h2>Machine <span>/ 01</span></h2><button id="audio" class="primary">Enable audio</button></div>
+      <section class="midi-input" aria-labelledby="midi-heading">
+        <div class="midi-input-heading"><h3 id="midi-heading">MIDI input</h3><button id="midi-connect" type="button">Connect MIDI input</button></div>
+        <div class="midi-input-controls"><label for="midi-device">Input device</label><select id="midi-device" disabled><option value="">Select an input…</option></select></div>
+        <p id="midi-status" class="midi-status" role="status" aria-live="polite">MIDI input is optional. Connect a device to choose a keyboard.</p>
+      </section>
       <div class="screen-toolbar"><div class="segmented" aria-label="Screen view"><button id="routing" aria-pressed="true">Routing</button><button id="waveform" aria-pressed="false">Waveform</button></div><label class="zoom-label">Preview <select id="zoom"><option value="fit">Fit</option><option value="native">1× pixels</option></select></label></div>
       <div class="screen-frame" id="frame"><div id="screen"></div></div>
       <div id="controls" class="controls"></div>

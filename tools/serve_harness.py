@@ -19,7 +19,7 @@ ALLOWED = {
     '/': 'harness/index.html',
     '/harness/': 'harness/index.html',
     **{f'/harness/{name}': f'harness/{name}' for name in
-       ('index.html', 'style.css', 'app.mjs', 'screen.mjs', 'processor.mjs')},
+       ('index.html', 'style.css', 'app.mjs', 'screen.mjs', 'processor.mjs', 'midi-input.mjs')},
 }
 MIME = {'.html': 'text/html', '.css': 'text/css', '.mjs': 'text/javascript'}
 

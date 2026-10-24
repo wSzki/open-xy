@@ -22,6 +22,26 @@ server port is occupied. Open http://127.0.0.1:8917/, enable audio, then play
 `A W S E D F T G Y H U J K` or the on-screen keyboard. Escape/Stop all and loss
 of window focus release notes. Monitor gain is separate from engine parameters.
 
+## MIDI input
+
+Enable audio with the existing audio button, then choose **Connect MIDI input**
+to request browser permission. Connecting does not enable audio or choose a
+device automatically; select a keyboard from the input list. MIDI input supports
+note-on and note-off for all 16 channels, with note-on velocity controlling
+level. A note-on with velocity zero is treated as note-off.
+
+Web MIDI requires a supported browser and a secure context. `http://127.0.0.1`
+is treated as secure for local development; an insecure or unsupported browser
+can still use the on-screen and computer keyboards. The browser may show a
+permission prompt only after Connect is activated. Chrome's prompt may mention
+controlling or reprogramming devices for all MIDI; this preview requests
+`{sysex: false}` and remains input-only.
+
+The preview does not send MIDI, use SysEx, or open MIDI outputs. Stop all, audio
+mute, window blur, and hidden-page cleanup release held MIDI notes; page exit
+disconnects the selected input. No hardware MIDI device qualification is
+implied.
+
 To change sound or display, edit the C++, rebuild into a fresh directory,
 restart the server and reload. Edit `definition.json` for controls, then
 rebuild.

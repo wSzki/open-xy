@@ -103,6 +103,35 @@ what happened and where the output landed.
 - The cutoff fix passed independent maker-checker review, including the checker’s contained head regression and the hash-bound two-change product diff. Final actual 44.1-kHz callback captures contain twelve four-second cases with all core/SRC counters zero (`audition/results-callback-44100-20261024-04/`). The corrected playable preview `-06` is served at `http://127.0.0.1:8939/`; initial preview `-05` remains available at port 8938 for comparison.
 - Public checks pass 78 Node tests and 120 Python tests in each normal/`-O` run, with six explicit private-fixture skips. Host/WASM behavior is exercised; native SRC cost/full-module compilation and release qualification remain deferred by the external-output restriction, stock inputs and required Windows host. No device operation or human-listening approval is claimed.
 
+- Implemented opt-in MIDI input in the shared preview harness: explicit connection
+  request, per-input/channel/note ownership, device picker, no auto-selection,
+  `sysex: false`, and no MIDI outputs.
+- Ten MIDI boundary tests now pass after three source-bound regressions failed
+  before and passed after: same-port stale close, stale cleanup
+  failure, and observer-exception misclassification. Native MIDI access in
+  Chrome was verified with `sysexEnabled: false` and no auto-selected input.
+  Browser hardware-boundary fixture events drove the real C++/WASM with typing
+  overlap, velocity-zero release, channel release, panic, input switch,
+  unplug, no-input and pagehide cases; no errors. Physical keystrokes were not
+  exercised. Evidence: `local/rings-night-001/midi-validation/`, including
+  `browser-evidence.json`, `native-permission-evidence.json`,
+  `midi-workbench.png`, `lifecycle-red.json`, and `lifecycle-green.json`.
+- QA containment lesson: `MAC_CHROMIUM_TMPDIR` and repository-scoped Unix
+  socket permissions were needed. Dedicated local QA Chromium disabled only
+  its nested internal sandbox while the outer repository-only file/network
+  policy remained active. `/usr/bin/make`'s `xcrun` shim cache attempts were
+  denied; the actual installed CLT `make` was used for clean verification.
+  No outside-write exception or install was introduced. Chrome
+  `BlockMidiByDefault` needs the stronger QA permission descriptor, while the
+  product request and result remain non-SysEx.
+- Final `make check` passes all 88 Node tests and 120 Python tests in each
+  normal/`-O` run, with six explicit private-fixture skips per Python run.
+  Preserved the raw invocation and output in `midi-validation/final-public-check.json`.
+  Refreshed the live servers so their file allowlist includes the MIDI module.
+  Ports 8938 and 8939 now serve the current `-06` preview: restarting `-05`
+  correctly failed the stale-source guard, so its artifact remains preserved
+  without weakening authentication or presenting it as a current live build.
+
 - Ran `python3 sdk.py check`: 78 browser-labelled Node tests passed; each
   Python run (normal and `-O`) discovered 113 tests, with 107 successful and
   six private-package cases skipped. Saved raw process output under
