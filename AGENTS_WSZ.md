@@ -11,13 +11,25 @@ to all shared code; this file only adds fork-specific conventions and pointers.
   (flashing, installing, any hardware write) require a separate explicit user
   instruction — never infer them. The unit runs OS 1.2.0 with no documented
   downgrade path; treat it as unrecoverable if bricked.
-- Keep the base repo clean: the only fork edit to an upstream file is the
-  pointer section at the end of `AGENTS.md`. Fork conventions live here; logs
-  and indexes in `CHANGELOG.md` / `WORKLOG.md`; generated and research outputs
-  under ignored `local/`.
-- Port work follows the vendoring conventions of `machines/macroosc`
-  (VENDOR.json SHA pins, `OP-XY:` patch comments, tables regenerated at
-  44,100 Hz, `LeasePool` for delay memory, per-voice RNG reseed).
+- Keep the base repo clean except for explicitly approved shared changes. Fork conventions live here; logs and indexes in `CHANGELOG.md` / `WORKLOG.md`; generated and research outputs under ignored `local/`.
+- `RINGS_ENGINE_PLAN.md` describes the authorized, device-free Rings port and
+  collection-selection prerequisite. Target a very close-sounding instrument,
+  not bit-identical floating-point behavior. Exact sample errors and modal
+  peak identities are diagnostics, not prerequisites to implementing the DSP.
+- Preserve the selected three models, full modal/string banks, two independently
+  leased contexts and six controls. Prioritize a playable integer port and
+  representative reference/port A/B recordings over expanding the validator.
+- Follow `machines/macroosc` vendoring conventions: pinned sources, original
+  notices, per-file hashes and explicit adaptation notes. Do not inherit its
+  sample-rate or RNG-reset policy blindly: Rings retains a 48-kHz core with the
+  proven 44.1-kHz converter, and seeds each context only on a new lease.
+- Defined integer arithmetic, bounded memory, valid coefficients, callback
+  allocation freedom and ownership isolation remain requirements. Do not
+  mistake relaxed sonic matching for permission to hide numerical faults.
+- Until the user lifts the overnight restriction, do not install dependencies,
+  perform destructive cleanup or write project outputs outside this checkout.
+  Native/firmware outputs must remain outside checkouts, so defer those builds
+  rather than redirect them into `local/`. Host/preview outputs may use `local/`.
 - Run `python sdk.py check` for every change; checks must stay active under
   `python -O`.
 
@@ -27,12 +39,18 @@ to all shared code; this file only adds fork-specific conventions and pointers.
 |---|---|
 | `CHANGELOG.md` | what changed in this fork, newest first |
 | `WORKLOG.md` | dated session log (what happened, where it lives) |
+| `RINGS_ENGINE_PLAN.md` | current authorized Rings implementation, sound scope and verification approach |
 | `local/port-plan-2026-10-24.md` | current audited MI port plan; supersedes the historical `local/port-plan.md` |
 | `local/research/outputs/opxy-hardware-mi-research-audit-2026-10-24.md` | current verification verdict, corrected brief and evidence index; earlier corpus remains preserved under `local/research/` |
 | `../opxy_jailbreak/` | earlier firmware-access research (outside this checkout) |
 
 ## Log conventions
 
-- `CHANGELOG.md`: one bullet per landed change. `WORKLOG.md`: one entry per
-  session. Findings and data go to dated files under `local/research/`, never
-  into this file. Supersede with a new dated file; never rewrite closed ones.
+- Update `WORKLOG.md` at meaningful implementation and verification milestones;
+  distinguish implemented, exercised, diagnostic-only and blocked work.
+  Keep `CHANGELOG.md` concise, with one bullet per landed change.
+- Commit small, coherent, verified milestones frequently. Do not stage another
+  worker's live files, publish unverified work as a working engine or push
+  without a separate instruction.
+- Findings and data go to dated files under ignored `local/`, never into this
+  file. Preserve closed evidence; supersede it rather than rewriting it.

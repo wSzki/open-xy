@@ -5,6 +5,7 @@ Newest first. One bullet per landed change; dates are ISO.
 ## 2026-10-24
 
 - Added opt-in collection selection and native compile proof; defaults and profile/ABI remain unchanged. Collection path-escape coverage no longer depends on temporary directories being outside the checkout.
+- Updated the Rings implementation plan and fork instructions to target close musical behavior rather than exact floating-point identity, while retaining the three-model scope and runtime safety requirements.
 
 - Independently audited all 115 research references and the SDK/MI planning
   claims. The previous research is not execution-ready without the corrections
