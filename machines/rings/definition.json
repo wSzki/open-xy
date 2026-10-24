@@ -19,7 +19,7 @@
     "voiceBytes": 8,
     "voiceAlignment": 4,
     "voiceCapacity": 256,
-    "sharedBytes": 226904,
+    "sharedBytes": 226920,
     "outputPeakQ31": 1073741823,
     "display": { "kind": "segments", "characters": 4, "glow": 0, "dials": 4, "textControls": [0, 1] }
   }

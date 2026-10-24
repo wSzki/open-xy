@@ -27,9 +27,14 @@ to all shared code; this file only adds fork-specific conventions and pointers.
   allocation freedom and ownership isolation remain requirements. Do not
   mistake relaxed sonic matching for permission to hide numerical faults.
 - Until the user lifts the overnight restriction, do not install dependencies,
-  perform destructive cleanup or write project outputs outside this checkout.
-  Native/firmware outputs must remain outside checkouts, so defer those builds
-  rather than redirect them into `local/`. Host/preview outputs may use `local/`.
+  perform destructive cleanup or write outside this checkout, including compiler
+  temporaries, caches, browser profiles and generated evidence. Native/firmware
+  outputs must remain outside checkouts, so defer those builds rather than
+  redirect them into `local/`. Host/preview outputs may use `local/`.
+- Every host compile/run, including delegated work, must use the approved raw
+  sandbox, an explicit compiler/sysroot and repository-local HOME, TMPDIR and
+  caches. A local output path alone does not contain temporary writes. Record
+  the outer sandbox invocation with the evidence; do not use bare compiler calls.
 - Run `python sdk.py check` for every change; checks must stay active under
   `python -O`.
 

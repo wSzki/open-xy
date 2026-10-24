@@ -46,6 +46,29 @@ what happened and where the output landed.
 - Saved twelve four-second original-Part/integer-Core A/B pairs plus actual 44.1-kHz callback captures under `local/rings-night-001/integer-validation/audition/`; no human listening has occurred. The small comparison exposed material sympathetic-mode level/tone differences. Corrected an actual source-equation error (the voicing Squash curve used x⁴ instead of x¹⁶), improving the two default-patch RMS differences to +0.50/−1.68 dB. Bright/damped and sustain patches still differ by about −11.87/−9.43 dB, so their source equations remain under investigation; this is not being presented as accepted audible similarity.
 - Retained the corrected twelve-pair rerender at `audition/results-paired-48k-20261024-02/` and twelve callback WAVs at `results-callback-44100-20261024-02/`; `results-callback-proof-b42-20261024-01/results.json` records strict normal/ASan+UBSan callback passes and zero normal-run allocations for that source. Public SDK checks also pass with Rings registered (78 Node, 120 Python in each normal/`-O` run; six private skips). Browser checks exercised fresh signal updates for all three models/outputs, notes 60/67/72, actual preset/encoder controls, patch round-trip and panic on the earlier compiled preview. A/B tail inspection additionally found an unintended near-DC residual around −0.000767 in a damped inharmonic patch; that remaining shared-string-path fault is preserved for correction, not hidden by a silence clamp.
 - Corrected a separate SVF conversion defect: integrator states now round once from the raw accumulators instead of doubling already-rounded outputs. The focused nonzero-state regression and eight-second three-model renders pass in strict normal and ASan/UBSan builds (`model-core-20261024-07/` and `-08/`). The twelve-pair rerender (`audition/results-paired-48k-20261024-04/`) still shows the prior DC tail and sympathetic energy gap, so this correction is not claimed to solve them. A narrowly scoped private runtime trace is following the residual through excitation, DC blocking and string-loop states; no output silence clamp or gain fitting is being added.
+- Traced the damped inharmonic residual to the common exciter DC blocker's
+  rounded feedback: a ±1,200-Q25-LSB deadband fed the string delays. Carrying the
+  discarded fractional feedback removes that bias without a gate, clamp or gain
+  adjustment. The focused regression settles both signs to zero; the contained
+  eight-second ASan/UBSan render passes with all numeric counters zero
+  (`local/rings-night-001/integer-validation/model-core-20261024-10/`).
+- Host and executed WASM probes now agree on Context 113,448 B and Shared
+  226,920 B; updated the declaration accordingly. Strict normal and ASan/UBSan
+  callback proofs pass, with zero normal-run allocations (`callbacks/callback-run-20261024-06/`).
+  The rebuilt fixed-memory preview `local/rings-preview-20261024-05` also passes.
+  Twelve new A/B pairs (`audition/results-paired-48k-20261024-05/`) show the stuck
+  damped tail falling from about −62 to −130 dBFS. The sympathetic bright/sustain
+  gaps remain −12.49/−9.60 dB, so focused source-flow/coefficient diagnosis
+  continues; no human listening or audible-similarity approval is claimed.
+- Execution-boundary incident: a worker used bare compiler commands for the DC
+  proof instead of the required sandbox. Intended outputs are inside the repo,
+  but its compiler path, HOME and TMPDIR were not recorded; outside temporary
+  writes cannot be ruled out. Stopped that route and made the rule explicit here
+  and in `AGENTS_WSZ.md`; no outside cleanup was attempted. Its timed-out binary
+  links the Xcode clang-17 ASan runtime. A fresh explicit CLT-21/SDK-26 build under
+  the raw sandbox passes the full proof; the white-box driver's private-access
+  macro warning remains visible, while the production callback builds pass
+  strict warnings as errors. Failed attempts remain preserved.
 
 - Ran `python3 sdk.py check`: 78 browser-labelled Node tests passed; each
   Python run (normal and `-O`) discovered 113 tests, with 107 successful and

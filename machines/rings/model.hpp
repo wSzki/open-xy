@@ -92,6 +92,8 @@ struct PluckerState {
 struct ExciterState {
   SvfState filter;
   Audio dc_state;
+  // Raw Q56 product remainder: Q31 fractional units of one Q25 state LSB.
+  int32_t dc_feedback_remainder_q31;
   Audio previous_input;
   Unit dc_coefficient;
 };

@@ -4,6 +4,7 @@ Newest first. One bullet per landed change; dates are ISO.
 
 ## 2026-10-24
 
+- Fixed lost fractional feedback in the Rings exciter DC blocker, removing an unintended string-model DC tail; updated the measured shared-resource declaration.
 - Added opt-in collection selection and native compile proof; defaults and profile/ABI remain unchanged. Collection path-escape coverage no longer depends on temporary directories being outside the checkout.
 - Updated the Rings implementation plan and fork instructions to target close musical behavior rather than exact floating-point identity, while retaining the three-model scope and runtime safety requirements.
 - Added engine-local Rings fixed-point arithmetic, pinned-source table generation and shared SRC constants, with exercised host numeric/sanitizer checks.

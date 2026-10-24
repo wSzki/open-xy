@@ -1076,8 +1076,15 @@ void Core::render_string_bank(Frequency frequency, const Patch& patch,
     process_svf(plucker.filter, pluck_sample, 0, &pluck_low, stats_);
     input_[sample] = pluck_low;
 
-    const Audio dc_feedback = scale_audio_gain(
-        exciter_.dc_state, unit_to_gain(exciter_.dc_coefficient, stats_), stats_);
+    const int64_t dc_feedback_raw =
+        static_cast<int64_t>(exciter_.dc_state) * exciter_.dc_coefficient +
+        exciter_.dc_feedback_remainder_q31;
+    const Audio dc_feedback = narrow_i32(
+        round_shift(dc_feedback_raw, 31u, stats_), stats_);
+    const int64_t dc_feedback_rounded_raw =
+        static_cast<int64_t>(dc_feedback) * (INT64_C(1) << 31u);
+    exciter_.dc_feedback_remainder_q31 = narrow_i32(
+        dc_feedback_raw - dc_feedback_rounded_raw, stats_);
     Audio dc_output = audio_add(dc_feedback, input_[sample], stats_);
     dc_output = audio_sub(dc_output, exciter_.previous_input, stats_);
     exciter_.previous_input = input_[sample];
