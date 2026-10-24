@@ -24,9 +24,30 @@ import { PreviewDisplay, SvgDisplay } from '../sdk/browser/display.mjs';
 import { SegmentDisplay, SegmentSvg } from '../sdk/browser/segments.mjs';
 import { createMidiInput } from './midi-input.mjs';
 const segmented = previewManifest.graphics?.kind === 'segments';
+const isRings = definition.id === 'rings';
 const renderScreen = (...args) => renderBase(...args, controls, segmented, shown);
 const $ = id => document.getElementById(id);
 const controlId = id => customPreview ? `custom-control-${parameters.findIndex(p => p.id === id)}` : id;
+if (isRings) {
+  $('routing').textContent = 'Strings';
+  const monitor = $('monitor');
+  monitor.min = '0';
+  monitor.max = '4';
+  monitor.value = '2.6';
+  monitor.setAttribute('aria-label', 'Monitor gain');
+  const label = monitor.closest('label');
+  label.firstChild.textContent = 'Monitor gain ';
+  const readout = document.createElement('output');
+  readout.htmlFor = 'monitor';
+  const updateMonitorReadout = () => {
+    const gain = `${Number(monitor.value).toFixed(2)}×`;
+    readout.textContent = gain;
+    monitor.setAttribute('aria-valuetext', gain);
+  };
+  updateMonitorReadout();
+  label.append(readout);
+  monitor.addEventListener('input', updateMonitorReadout);
+}
 // Page copy comes from the machine: its definition and machine.json description.
 document.querySelector('.instrument-top h2').firstChild.textContent = definition.name + ' ';
 document.title = definition.name + ' · Machine workbench';

@@ -21,6 +21,8 @@ Use `--cxx /path/to/clang++` if Clang is not on PATH, or `--port 8937` if the
 server port is occupied. Open http://127.0.0.1:8917/, enable audio, then play
 `A W S E D F T G Y H U J K` or the on-screen keyboard. Escape/Stop all and loss
 of window focus release notes. Monitor gain is separate from engine parameters.
+For Rings-specific Strings display and default monitor behavior, see the
+[Rings README](../machines/rings/README.md#display).
 
 ## Make shortcuts
 

@@ -81,11 +81,24 @@ Use internal excitation, no external audio/CV or strummer/onset detector. The or
 
 Create three presets with all six fields: `Modal` uses the defaults; `Sympathetic` changes only `model` to 0.5; `Inharmonic` changes only `model` to 1. Use `kind: synth`, machine id/namespace `rings`, engine ID 1 and page 84, after rechecking no newly discovered machine occupies either value before publication. If either is now occupied, stop rather than stealing another registration.
 
-The segment screen reuses Macro Osc's retained segment/dial pattern: four characters `MODL` / `SYMP` / `INHR`, four amount dials, no glow, labels `MODAL` / `SYMPATHETIC` / `INHARMONIC`. `textControls: [0,1]` formats whichever alternate is shown; show model codes and `OUT`/`MIX`/`AUX` for enum slots, and one-decimal amounts for their primary slots. Use only `rings_` artwork IDs and SDK segment donors; retain the stock header and numeric SVG restrictions.
+The Rings display uses the shared C++ drawing contract: three parallel
+diagonal strings respond to note-event plucks and the four timbre controls
+across all three models, stable under reduced motion. It draws via
+`machines/rings/display.h`'s `Frame = opxy::draw::Frame<3, 32, 3, 1>` and a
+44-byte `DisplayState`; the native display reserves a numeric header area and
+vertex coordinates must stay within the numeric SVG constraints. Browser
+presentation, the monitor-gain protocol and the visible-monitor policy are
+specified in the Rings README.
 
 ### 6. Implement the integer DSP with a reference-informed sound loop
 
-New compiled files are `machines/rings/core.h`, `dsp.hpp`, `engine.cpp`, `display.cpp`, and the retained portable `vendor/rings/` / namespaced helper closure, plus `definition.json`, `machine.json` and `panel.svg.fragment`. The integer core remains to be implemented. Adapt the selected Rings kernels into a safe, useful integer instrument; use the reference to guide sound decisions, not as a bit-exact specification.
+The engine's compiled sources now live under `machines/rings/`: `core.h`,
+`dsp.hpp`, `model.hpp`/`model.cpp`, `engine.cpp`, `display.h`/`display.cpp`,
+`src.hpp` and the generated `tables.hpp`/`tables.cpp` (regenerable via
+`tools/generate_tables.py`), alongside `definition.json`, `machine.json`,
+`panel.svg.fragment` and the retained portable `vendor/` closure. The integer
+core is implemented and validated; adapt remaining sound decisions against the
+reference, not as a bit-exact specification.
 
 The following representations are a concrete starting point for implementation, not a mandate to reproduce the source's arithmetic path. Keep these Q formats and value ranges when they fit the chosen core; any deliberate deviation must preserve safe bounded arithmetic and the sound/usefulness of the instrument.
 
@@ -155,7 +168,7 @@ python3 sdk.py preview --engine rings --out local/rings-preview-001
 python3 tools/serve_harness.py --preview local/rings-preview-001
 ```
 
-Use a fresh output suffix if the directory already exists. Through the actual browser at `http://127.0.0.1:8917/`, enable audio and use the documented `window.machineLab` methods to play notes 60/67/72, change all three models and output selections, exercise encoder alternates, export/import a patch and panic. Observe controls, four-character model screen/dials and waveform; record audio-state/output diagnostics and screenshots, then close the tab/server. No claim of audible quality from RMS alone: save/listen to the representative host/browser output and report who actually listened. Browser gating/mixing differs from stock, so use the C++ runner for exact voice-stream assertions.
+Use a fresh output suffix if the directory already exists. Through the actual browser at `http://127.0.0.1:8917/`, enable audio and use the documented `window.machineLab` methods to play notes 60/67/72, change all three models and output selections, exercise encoder alternates, export/import a patch and panic. Observe the three-string display and top-bar controls/values, plus waveform as a secondary diagnostic; retain the existing patch, MIDI and safety conventions. No claim of audible quality from RMS alone: save/listen to representative host/browser output and report who actually listened. Browser gating/mixing differs from stock, so use the C++ runner for exact voice-stream assertions.
 
 ### Collection, native link and package proof
 

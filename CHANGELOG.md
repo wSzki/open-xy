@@ -2,6 +2,15 @@
 
 Newest first. One bullet per landed change; dates are ISO.
 
+## 2026-10-25
+
+- Refreshed the Rings LCD UI to three note-reactive strings drawn via the
+  shared C++ `Frame<3,32,3,1>` API, with Model/Output alternation in the top
+  row; sound engine unchanged.
+- Raised only the visible Rings monitor gain (default 2.6, max 4, about
+  +12 dB over the old 0.65); DSP and output routing unchanged. Evidence in
+  `local/rings-night-001/` and the worklog.
+
 ## 2026-10-24
 
 - Added Make shortcuts for serving an existing browser preview, explicitly

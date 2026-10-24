@@ -4,6 +4,43 @@ One entry per session, newest first. Findings and data live in dated files
 under `local/research/` or in `local/port-plan.md`; this file only records
 what happened and where the output landed.
 
+## 2026-10-25
+
+- Traced the reported Rings LCD overlap to authored segment/dial artwork
+  combined with the workbench's separate control strip. Chose the existing
+  shared drawing API for three note-reactive strings, with names/values above
+  them and no encoder art; the sound engine and output routing stay unchanged.
+  Before-change evidence against `8395d0c`: `local/rings-night-001/ui-display-before.json`
+  and `ui-lcd-before.png`. Nine real browser model/pitch cases at monitor 0.65
+  measured peaks 0.00561–0.01392 and maximum frame RMS 0.00151–0.00314
+  (`ui-levels-before.json`); the level change is confined to visible monitoring.
+- Landed the final LCD UI refresh: the shared C++ `Frame<3,32,3,1>` (frame
+  840 B, state 44 B, align 4) now draws three parallel strings with names and
+  values above them — no segment/dial/panel artwork. Top row alternates
+  Model/Output as formatted strings. Controls: Structure (tension/freq),
+  Brightness (harmonics/width), Damping (decay; higher = longer visual ring
+  out and spacing), Position (pluck profile/placement) — model-independent,
+  no PCM waveform; Waveform stays diagnostic. Visible monitoring default is
+  2.6 (max 4), +12.04 dB versus the old 0.65; DSP, output routes and
+  normalization are unchanged.
+- Verified preview `local/rings-preview-20261025-003457` passed SDK ABI,
+  fixed-memory, control-pitch, declared-peak, lifecycle and drawing checks
+  (WASM sha256 `ae5a383…62e5dd`). `ui-display-smoke.json`: 4,522 actual WASM
+  frames, anchored endpoints, cache/reset stability, 3 models, reduced motion;
+  vertex bounds x 113.83–366.17 / y 38.44–200.56 keep the native header clear.
+- Real browser desktop and 390 px mobile show no overflow: plucks, top-bar
+  alternation, patch round-trip, reduced-motion stability
+  (`ui-browser-acceptance.json`, `ui-reduced-motion.json`, screenshots
+  `ui-lcd-final-rest.png`, `ui-lcd-final-plucked.png` and
+  `ui-lcd-final-mobile.png`). Sample-tap headroom: 15 pre/post
+  monitor cases measure 0.65→0.649999977 and 2.6→2.59999991, mute exact zero;
+  max observed post-peak 0.6029305458 (<1) across all models/routes/bursts
+  (`ui-audio-headroom.json`). No human listening, physical MIDI, device or
+  native/release qualification; artifacts under ignored `local/rings-night-001/`.
+- Observed public check on the final code: 88 Node tests passed; each normal
+  and `-O` Python run had 120 tests with six private-fixture skips. Raw output:
+  `local/rings-night-001/ui-public-check.json`.
+
 ## 2026-10-24
 
 - Added Make shortcuts in `docs/preview.md` and linked them from the fork

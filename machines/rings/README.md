@@ -31,6 +31,12 @@ The DSP core runs at 48 kHz and uses 147/160 sample-rate conversion. Its output
 framing has a 147-frame delay. Two sounding contexts are shared: starting a
 third takes the oldest context. Browser preview has eight lightweight voices,
 not eight complete DSP instances.
+## Display
+
+The display draws three parallel diagonal strings. Note-event plucks and the
+four timbre controls affect their vibration across all three models. Reduced
+motion keeps the display stable. This is a string visualization, not an exact
+PCM waveform.
 
 ## Preview
 
@@ -46,6 +52,11 @@ Open the harness URL printed by the server, enable audio, and select Rings.
 To build firmware with Rings, use the opt-in
 [`profiles/collection-rings.json`](../../profiles/collection-rings.json)
 recipe; the default collection remains unchanged.
+
+The Rings-only visible monitor ranges from 0 to 4 and defaults to 2.6×, about
+12 dB higher than the former 0.65× setting. This monitor gain is isolated from
+the DSP, patches and Output selection (Out/Mix/Aux); it adds no DSP boost.
+
 
 Native/device qualification is not complete; no device behavior or listening
 result is claimed here.

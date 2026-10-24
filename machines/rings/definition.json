@@ -21,6 +21,6 @@
     "voiceCapacity": 256,
     "sharedBytes": 226920,
     "outputPeakQ31": 1073741823,
-    "display": { "kind": "segments", "characters": 4, "glow": 0, "dials": 4, "textControls": [0, 1] }
+    "display": { "kind": "drawing", "stateBytes": 44, "stateAlignment": 4, "paths": 3, "points": 32, "nodes": 3, "palette": 1 }
   }
 }
