@@ -85,7 +85,7 @@ The Rings display uses the shared C++ drawing contract: three parallel
 diagonal strings respond to note-event plucks and the four timbre controls
 across all three models, stable under reduced motion. It draws via
 `machines/rings/display.h`'s `Frame = opxy::draw::Frame<3, 32, 3, 1>` and a
-44-byte `DisplayState`; the native display reserves a numeric header area and
+40-byte `DisplayState`; the native display reserves a numeric header area and
 vertex coordinates must stay within the numeric SVG constraints. Browser
 presentation, the monitor-gain protocol and the visible-monitor policy are
 specified in the Rings README.

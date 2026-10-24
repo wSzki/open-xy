@@ -62,31 +62,28 @@ inline void set_point(Frame::path_type& path, u32 index, i32 x, i32 y, bool& cha
     point.y = y;
 }
 
-// Each path is a narrow closed strip: one edge forward, the other reversed.
+// One solid stroke per string: a steep "/" diagonal whose ends are anchored.
+// Both outline edges share the same points, so the closed strip renders as a
+// single crisp line instead of a blurred double edge.
 inline void string_path(Frame::path_type& path, u32 string, i32 brightness,
-                        u32 peak, i32 amplitude, u32 phase, i32 rise) {
+                        u32 peak, i32 amplitude, u32 phase) {
     const u32 old_key = path.key;
     bool changed = old_key == 0;
-    const i32 width = 160 + floor_q10(brightness * 128);
-    const i32 normal_x = (width * rise) / 128;
     const u32 time = (phase + string * 6u) & 63u;
 
     for (u32 sample = 0; sample < 16; ++sample) {
-        const i32 x = -63 * unit + static_cast<i32>(sample * 126u * unit / 15u);
-        const i32 base_y = -(rise * unit / 2) + rise * static_cast<i32>(unit * sample) / 15;
+        const i32 x = -15 * unit + static_cast<i32>(sample * 31u * unit / 15u);
+        const i32 y = 48 * unit - static_cast<i32>(sample * 96u * unit / 15u);
         i32 displacement = 0;
         if (amplitude) {
             const u32 spatial = sample * 64u / 15u;
             const i32 profile = pluck_profile(sample, peak);
             const i32 envelope = floor_q10(amplitude * profile);
             const i32 wave = vibration(spatial, time, brightness);
-            displacement = floor_q10(floor_q10(envelope * wave) * (2 * unit));
+            displacement = floor_q10(floor_q10(envelope * wave) * (3 * unit));
         }
-        const i32 y = base_y + displacement;
-        const i32 upper_x = x - normal_x;
-        const i32 lower_x = x + normal_x;
-        set_point(path, sample, upper_x, y + width, changed);
-        set_point(path, 31u - sample, lower_x, y - width, changed);
+        set_point(path, sample, x + displacement, y, changed);
+        set_point(path, 31u - sample, x + displacement, y, changed);
     }
 
     if (changed) {
@@ -103,7 +100,6 @@ inline void display_reset(DisplayState& state) {
     state.decay_remainder = 0;
     state.phase = 0;
     state.initialized = 0;
-    state.cached_rise = 0;
     state.cached_brightness = 0;
     state.cached_position = 0;
     state.cached_amplitude = 0;
@@ -127,7 +123,10 @@ inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& 
         state.phase = 0;
     } else if (!input.reduced_motion && state.amplitude) { // Reduced motion holds note state; controls still shape the lines.
         const i32 elapsed = clamp(input.elapsed, 0, expired);
-        const i32 decay = elapsed * (unit + 127 - damping) + static_cast<i32>(state.decay_remainder);
+        // Visible ring-out stays inside the audible decay: about 0.45 s at
+        // minimum Damping and 1.3 s at maximum, instead of outlasting the sound.
+        const i32 rate = 2304 - ((damping * 1536) >> 10);
+        const i32 decay = elapsed * rate + static_cast<i32>(state.decay_remainder);
         const i32 loss = floor_q10(decay);
         state.decay_remainder = static_cast<u32>(decay - loss * unit);
         if (state.amplitude > loss) {
@@ -137,7 +136,7 @@ inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& 
             state.decay_remainder = 0;
         }
         if (state.amplitude) {
-            const u32 frequency = 2u + (static_cast<u32>(structure) * 10u >> 10); // 2..11 cycles per second.
+            const u32 frequency = 3u + (static_cast<u32>(structure) * 10u >> 10); // 3..13 cycles per second.
             state.phase = (state.phase + static_cast<u32>(elapsed) * frequency) & 1023u;
         }
     }
@@ -151,28 +150,28 @@ inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& 
     state.previous_event = input.note_serial;
     state.initialized = 1;
 
-    const i32 rise = 16 + static_cast<i32>(static_cast<u32>(structure) * 23u >> 10);
-    const i32 gap = 30 + static_cast<i32>(static_cast<u32>(damping) * 10u >> 10);
-    const i32 center = 120 + static_cast<i32>(static_cast<u32>(position) * 8u >> 10) - 4;
+    // Position tilts the pluck point and shifts the whole group sideways.
+    const i32 shift = static_cast<i32>(static_cast<u32>(position) * 12u >> 10) - 6;
     // Position selects a triangular pluck profile between interior samples 2..13.
     const u32 peak = state.amplitude ? 2u + (static_cast<u32>(position) * 12u >> 10) : 0;
     const u32 wave_phase = state.amplitude ? state.phase >> 4 : 0;
     // Cache the exact quantized geometry inputs; steady strings skip all path work.
-    const bool geometry_changed = state.cached_rise != rise || state.cached_brightness != brightness ||
+    // Structure only drives vibration frequency, so it never rebuilds resting geometry.
+    // A fresh frame (key 0) is always written: the first call after reset sets every path.
+    const bool geometry_changed = !frame.paths[0].key || state.cached_brightness != brightness ||
         state.cached_position != static_cast<i32>(peak) || state.cached_amplitude != state.amplitude ||
         state.cached_phase != wave_phase;
     if (geometry_changed) {
         for (u32 string = 0; string < Frame::path_count; ++string)
-            string_path(frame.paths[string], string, brightness, peak, state.amplitude, wave_phase, rise);
-        state.cached_rise = rise;
+            string_path(frame.paths[string], string, brightness, peak, state.amplitude, wave_phase);
         state.cached_brightness = brightness;
         state.cached_position = static_cast<i32>(peak);
         state.cached_amplitude = state.amplitude;
         state.cached_phase = wave_phase;
     }
     for (u32 string = 0; string < Frame::path_count; ++string) {
-        const i32 y = center + (static_cast<i32>(string) - 1) * gap;
-        place(frame, string, 240 * unit, y * unit, 2 * unit, 0, fill_and_stroke);
+        const i32 x = 240 + (static_cast<i32>(string) - 1) * 76 + shift;
+        place(frame, string, x * unit, 120 * unit, 2 * unit, 0, fill_and_stroke);
     }
 }
 } // namespace rings

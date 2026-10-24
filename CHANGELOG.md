@@ -7,6 +7,10 @@ Newest first. One bullet per landed change; dates are ISO.
 - Refreshed the Rings LCD UI to three note-reactive strings drawn via the
   shared C++ `Frame<3,32,3,1>` API, with Model/Output alternation in the top
   row; sound engine unchanged.
+- Tuned the Rings strings after audition feedback: steep single-stroke
+  diagonals (no doubled blurry edge), visible ring-out shortened to stay inside
+  the audible decay, and the browser top row restyled as the stock stepped
+  header. DisplayState shrank to 40 B.
 - Raised only the visible Rings monitor gain (default 2.6, max 4, about
   +12 dB over the old 0.65); DSP and output routing unchanged. Evidence in
   `local/rings-night-001/` and the worklog.

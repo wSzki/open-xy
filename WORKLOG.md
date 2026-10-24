@@ -40,6 +40,21 @@ what happened and where the output landed.
 - Observed public check on the final code: 88 Node tests passed; each normal
   and `-O` Python run had 120 tests with six private-fixture skips. Raw output:
   `local/rings-night-001/ui-public-check.json`.
+- Tuned the strings after user feedback (ring-out outlasting the sound, blurry
+  doubled edges, shallow slope, plain top row). `string_path` now draws one
+  solid steep "/" stroke per string (identical outline edges, 0.6-unit stroke),
+  decay runs 0.5–1.4 s inside the audible window (smoke: 512 vs 1408 Q10), and
+  the browser top row replicates the stock stepped 20 px header with
+  light/dark text halves. Removed the unused cache word: state 40 B, align 4;
+  first-frame paths are always written (`!frame.paths[0].key` guard) after the
+  contract caught a zero-key frame. Fresh preview
+  `local/rings-preview-20261025-012958` (WASM `079ad24b…fd506`) passed SDK
+  preview checks; `ui-display-smoke-tuned.json` (4,311 frames, bounds
+  x 128–353 / y 24–216), `ui-browser-acceptance-tuned.json` (pluck settles in
+  450 ms, header alternates, patch round-trip, reduced motion, mobile fit,
+  screenshots `ui-lcd-tuned-rest/plucked/mobile.png`), non-Rings renderer
+  parity and the full public check (88 Node; 120 Python per run, six skips)
+  all pass.
 
 ## 2026-10-24
 
