@@ -69,6 +69,22 @@ what happened and where the output landed.
   the raw sandbox passes the full proof; the white-box driver's private-access
   macro warning remains visible, while the production callback builds pass
   strict warnings as errors. Failed attempts remain preserved.
+- Completed the current preview's real browser pass: fresh audio from all three
+  models and output routes, all six keyboard-operated sliders, presets, phrase,
+  three held notes, patch round-trip and panic; no browser errors were recorded.
+  Evidence: `local/rings-night-001/integer-validation/browser-20261024-02/`.
+  The actual-base/current-source DC regression also fails before and passes
+  after for both signs (`dc-seed-base-head-20261024-01/results.json`).
+- The source-grounded coefficient probe ruled out two false leads: limiter gain
+  is already correct in Q29, and the original semitone helper uses the same
+  truncated lookup. It exposed two actual unsigned constant-expression
+  overflows in the Q24 Nyquist/infinite-decay cutoffs (`model.cpp`); correction
+  and rerender remain pending. The user requested the playable build first:
+  `RingsPlayable` serves verified preview `-05` at `http://127.0.0.1:8938/`.
+  Automatic visible Chromium launch failed at its singleton socket directory
+  under the strict write sandbox; no outside-write allowance was added.
+
+- Recorded the standing user convention: provision `WORKLOG.md` and `CHANGELOG.md` when absent, and maintain both throughout coding work. The same preference is retained for future projects.
 
 - Ran `python3 sdk.py check`: 78 browser-labelled Node tests passed; each
   Python run (normal and `-O`) discovered 113 tests, with 107 successful and

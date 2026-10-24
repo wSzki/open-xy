@@ -51,7 +51,8 @@ to all shared code; this file only adds fork-specific conventions and pointers.
 
 ## Log conventions
 
-- Update `WORKLOG.md` at meaningful implementation and verification milestones;
+- Provision `WORKLOG.md` and `CHANGELOG.md` at the start of project work if absent; keep both updated throughout implementation.
+  Update `WORKLOG.md` at meaningful implementation and verification milestones;
   distinguish implemented, exercised, diagnostic-only and blocked work.
   Keep `CHANGELOG.md` concise, with one bullet per landed change.
 - Commit small, coherent, verified milestones frequently. Do not stage another
