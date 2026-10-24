@@ -100,6 +100,8 @@ what happened and where the output landed.
   normal/ASan+UBSan checks pass with zero normal-run allocations
   (`callbacks/callback-run-20261024-07/`); the separate preview `-06` passes
   fixed-memory/ABI/ownership/drawing checks. Live preview `-05` is untouched.
+- The cutoff fix passed independent maker-checker review, including the checker’s contained head regression and the hash-bound two-change product diff. Final actual 44.1-kHz callback captures contain twelve four-second cases with all core/SRC counters zero (`audition/results-callback-44100-20261024-04/`). The corrected playable preview `-06` is served at `http://127.0.0.1:8939/`; initial preview `-05` remains available at port 8938 for comparison.
+- Public checks pass 78 Node tests and 120 Python tests in each normal/`-O` run, with six explicit private-fixture skips. Host/WASM behavior is exercised; native SRC cost/full-module compilation and release qualification remain deferred by the external-output restriction, stock inputs and required Windows host. No device operation or human-listening approval is claimed.
 
 - Ran `python3 sdk.py check`: 78 browser-labelled Node tests passed; each
   Python run (normal and `-O`) discovered 113 tests, with 107 successful and

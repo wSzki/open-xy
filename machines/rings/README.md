@@ -2,8 +2,9 @@
 
 Rings is an experimental fixed-point resonator inspired by Mutable Instruments
 Rings. It provides three models: modal resonances, sympathetic strings, and
-inharmonic strings. The modal model uses a 60-mode bank; the string models each
-retain their full eight-voice bank. This is an algorithmic rewrite, not a
+inharmonic strings. The modal model uses a 60-mode bank; the sympathetic model
+couples all eight strings. Inharmonic uses one dispersive string per context,
+as in the original monophonic model. This is an algorithmic rewrite, not a
 bit-identical port of the original floating-point code. Source and license
 notes are in [`vendor/VENDOR.md`](vendor/VENDOR.md).
 

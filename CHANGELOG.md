@@ -4,6 +4,7 @@ Newest first. One bullet per landed change; dates are ISO.
 
 ## 2026-10-24
 
+- Clarified Rings model-bank wording and recorded the final host/WASM, callback-audio and playable-preview verification evidence; native/release qualification remains deferred.
 - Corrected overflowing Rings cutoff constants, restoring high-frequency string energy and the long-decay filter transition without gain compensation.
 - Made provisioning and maintaining `WORKLOG.md` and `CHANGELOG.md` an explicit fork convention.
 - Fixed lost fractional feedback in the Rings exciter DC blocker, removing an unintended string-model DC tail; updated the measured shared-resource declaration.
