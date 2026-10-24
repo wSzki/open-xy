@@ -1,6 +1,7 @@
 """machine.json: kinds, displays and the stock identity each machine declares."""
 import copy
 import json
+import tempfile
 from pathlib import Path
 import unittest
 from unittest import mock
@@ -17,12 +18,93 @@ def identity(kind, **changes):
     return dict(value, **changes)
 
 
+class CollectionSelection(unittest.TestCase):
+    def write_recipe(self, folder, contents):
+        path = Path(folder) / 'selection.json'
+        path.write_text(contents, encoding='utf-8')
+        return path.relative_to(machines.ROOT).as_posix()
+
+    def test_default_and_explicit_default_resolve_to_the_same_recipe(self):
+        self.assertEqual(machines.collection_file(), 'profiles/collection.json')
+        self.assertEqual(machines.collection_file('profiles/collection.json'), machines.collection_file())
+
+    def test_recipe_selects_only_its_listed_machines(self):
+        with tempfile.TemporaryDirectory(dir=machines.ROOT) as folder:
+            selected = self.write_recipe(folder, json.dumps({'schema': 1, 'machines': ['fm2op']}))
+            self.assertEqual([m.id for m in machines.collection(selected)], ['fm2op'])
+
+    def test_recipe_schema_and_json_are_strict(self):
+        invalid = ('{', '[]', json.dumps({'schema': True, 'machines': ['fm2op']}),
+                   json.dumps({'schema': 1, 'machines': ['fm2op'], 'extra': False}),
+                   json.dumps({'schema': 1}))
+        with tempfile.TemporaryDirectory(dir=machines.ROOT) as folder:
+            for contents in invalid:
+                with self.subTest(contents=contents):
+                    selected = self.write_recipe(folder, contents)
+                    with self.assertRaises(ValueError):
+                        machines.collection(selected)
+
+    def test_empty_duplicate_malformed_and_unknown_selections_are_rejected(self):
+        invalid = ({'schema': 1, 'machines': []},
+                   {'schema': 1, 'machines': ['fm2op', 'fm2op']},
+                   {'schema': 1, 'machines': [[]]},
+                   {'schema': 1, 'machines': ['unknown']})
+        with tempfile.TemporaryDirectory(dir=machines.ROOT) as folder:
+            for value in invalid:
+                with self.subTest(value=value):
+                    selected = self.write_recipe(folder, json.dumps(value))
+                    with self.assertRaises(ValueError):
+                        machines.collection(selected)
+
+    def test_recipe_rejects_unsafe_and_non_file_paths(self):
+        with self.assertRaisesRegex(ValueError, '^Collection must be a repository-relative \\.json file$'):
+            machines.collection_file(Path('profiles/collection.json'))
+        for unsafe in ('/profiles/collection.json', '../profiles/collection.json',
+                       'profiles\\collection.json', 'profiles/collection.json:alternate'):
+            with self.subTest(path=unsafe), self.assertRaises(ValueError):
+                machines.collection_file(unsafe)
+        with tempfile.TemporaryDirectory(dir=machines.ROOT) as folder:
+            missing = (Path(folder) / 'missing.json').relative_to(machines.ROOT).as_posix()
+            with self.assertRaises(ValueError) as error:
+                machines.collection_file(missing)
+            self.assertEqual(str(error.exception), 'Missing collection file: ' + missing)
+            not_json = Path(folder) / 'selection.txt'
+            not_json.write_text('{}', encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'extension'):
+                machines.collection_file(not_json.relative_to(machines.ROOT).as_posix())
+            directory = Path(folder) / 'directory.json'
+            directory.mkdir()
+            with self.assertRaisesRegex(ValueError, 'Missing collection file:'):
+                machines.collection_file(directory.relative_to(machines.ROOT).as_posix())
+
+    def test_symlink_to_outside_repository_is_rejected(self):
+        with tempfile.TemporaryDirectory(dir=machines.ROOT) as folder, tempfile.TemporaryDirectory(dir=machines.ROOT) as outside:
+            root = Path(folder) / 'isolated'
+            root.mkdir()
+            target = Path(outside) / 'selection.json'
+            target.write_text(json.dumps({'schema': 1, 'machines': ['fm2op']}), encoding='utf-8')
+            link = root / 'outside.json'
+            link.symlink_to(target)
+            selected = link.relative_to(root).as_posix()
+            with mock.patch.object(machines, 'ROOT', root):
+                with self.assertRaisesRegex(ValueError, 'Path escapes its root'):
+                    machines.collection_file(selected)
+
+    def test_selected_recipe_rejects_conflicting_identities(self):
+        with tempfile.TemporaryDirectory(dir=machines.ROOT) as folder:
+            selected = self.write_recipe(folder, json.dumps({'schema': 1, 'machines': ['fm2op', 'macroosc']}))
+            original = machines.machine
+
+            def clash(name):
+                machine = original(name)
+                if name == 'macroosc':
+                    return machines.Machine(**dict(machine.__dict__, identity=dict(engine=34, page=82)))
+                return machine
+            with mock.patch.object(machines, 'machine', clash), self.assertRaisesRegex(ValueError, 'Conflicting'):
+                machines.collection(selected)
+
+
 class Identity(unittest.TestCase):
-    def test_bundled_machines_declare_valid_identities(self):
-        # Every bundled machine is valid and part of the collection, in its declared order.
-        listed = json.loads(machines.COLLECTION.read_text(encoding='utf-8'))['machines']
-        self.assertEqual({m.id for m in machines.discovered()}, set(listed))
-        self.assertEqual([m.id for m in machines.collection()], listed)
 
     def test_stock_occupied_or_sentinel_ids_are_rejected(self):
         for kind, change in (('synth', dict(engine=33)), ('synth', dict(engine=2)), ('synth', dict(engine=63)),

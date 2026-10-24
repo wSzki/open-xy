@@ -28,10 +28,8 @@ def notices(machines):
     return '\n\n'.join(texts)
 
 
-def export(package, output, tools, preview_cxx='clang++', *, stock_catalog):
-    recipe = json.loads(read(ROOT / 'profiles/collection.json'))
-    profile, machines, definitions = native.configuration()
-    require(recipe['schema'] == 1, 'Unsupported collection')
+def export(package, output, tools, preview_cxx='clang++', *, stock_catalog, collection_path=None):
+    profile, machines, definitions = native.configuration(collection_path)
     require(sha(stock_catalog) == profile['stock_catalog_sha256'], 'Stock catalog hash mismatch')
     owners, services = native.object_owners(machines, profile), native.object_services(machines, profile)
     kit_machines = []
@@ -168,6 +166,7 @@ def main(argv=None):
     parser.add_argument('--preview-cxx', default='clang++', help='Clang++ with wasm32/wasm-ld')
     parser.add_argument('--personal', action='store_true',
                         help='a kit for your own collection on any pinned host, without release verification')
+    parser.add_argument('--collection', help='repository-relative .json collection recipe')
     args = parser.parse_args(argv)
     try:
         if not args.personal:
@@ -179,15 +178,18 @@ def main(argv=None):
     try:
         package = out / 'source'
         native.build(package, Path(args.toolchain), Path(args.compiler),
-                     Path(args.stock_os), Path(args.stock_content))
+                     Path(args.stock_os), Path(args.stock_content), args.collection)
         options = []
         for name in ('toolchain', 'compiler', 'stock_os', 'stock_content'):
             options += ['--' + name.replace('_', '-'), str(Path(getattr(args, name)).resolve())]
+        if args.collection is not None:
+            options += ['--collection', args.collection]
         if not args.personal:  # independent rebuild against the reference bytes
             subprocess.run([sys.executable, str(ROOT / 'sdk.py'), 'check', '--native-package', str(package), *options],
                            cwd=ROOT, check=True)
         export(package, out, tool_paths(args.toolchain), args.preview_cxx,
-               stock_catalog=read(Path(args.stock_content) / 'op1_factory.json'))
+               stock_catalog=read(Path(args.stock_content) / 'op1_factory.json'),
+               collection_path=args.collection)
         # Validate firmware and content output against the independent Python writer.
         for mode in ([], ['-O']):
             subprocess.run([sys.executable, *mode, str(ROOT / 'tools/check_browser_firmware.py'), str(out),

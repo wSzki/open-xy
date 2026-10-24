@@ -26,7 +26,7 @@ from .adapters import (catalog_entry, generate_display, generate_fx_object, gene
 from .contributors import validate_source_boundary
 from .firmware import active_services, assemble, hook_instruction, hook_target, patch_active
 from .formats import elf32, elf_sections, require, sha
-from .machines import by_kind, collection
+from .machines import by_kind, collection, collection_file
 from .pipeline import (PROFILE, ROOT, check_patch_boundaries, child, config, document, execute, fresh_output, host_pins, host_platform,
                        read, require_release_host, resolve_toolchain, save_json, tool_paths)
 from .startup import generate as generate_startup
@@ -54,11 +54,11 @@ NUMBER = r'[-+]?(?:\d+(?:\.\d*)?|\.\d+)'
 SVG_INHERITED = {'fill', 'stroke', 'stroke-width', 'font-family', 'font-size', 'style'}
 
 
-def configuration():
+def configuration(collection_path=None):
     profile = config()
     stock_tables.check_profile(profile)
     require([p['kind'] for p in profile['patches']].count('startup') == 1, 'Expected one startup label edit')
-    machines = collection()
+    machines = collection(collection_path)
     definitions = dict(DEFINITIONS)
     for m in machines:
         if m.kind == 'effect':
@@ -70,9 +70,9 @@ def configuration():
     return profile, machines, definitions
 
 
-def provenance(machines):
+def provenance(machines, collection_path=None):
     """Every authored, SDK and compiler-profile input; private artifacts never enter."""
-    paths = {PROFILE, LINKER, 'profiles/collection.json'}
+    paths = {PROFILE, LINKER, collection_file(collection_path)}
     for folder in ('sdk/include', 'sdk/platform', 'tooling', *('machines/' + m.id for m in machines)):
         paths |= {p.relative_to(ROOT).as_posix() for p in (ROOT / folder).rglob('*')
                   if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.md'}
@@ -222,7 +222,7 @@ def object_services(machines, profile=None):
             if m is None and step in UNIT_SERVICES}
 
 
-def compile_collection(directory, toolchain, compiler, profile, machines, definitions):
+def compile_collection(directory, toolchain, compiler, profile, machines, definitions, collection_path=None):
     """Compile and link every machine; return the module bytes, report and patched profile."""
     directory = Path(directory)
     for m in machines:
@@ -232,7 +232,7 @@ def compile_collection(directory, toolchain, compiler, profile, machines, defini
     tools = tool_paths(toolchain)
     gcc = compiler_paths(compiler)
     require(sha(read(ROOT / LINKER)) == profile['linker_sha256'], 'Unreviewed memory layout')
-    before = provenance(machines)
+    before = provenance(machines, collection_path)
     effects, sample_engines = by_kind(machines, 'effect'), by_kind(machines, 'sample')
 
     def assemble_unit(source, obj):
@@ -301,7 +301,7 @@ def compile_collection(directory, toolchain, compiler, profile, machines, defini
         total = limit + int(overflow.group(1)) if overflow else sum(sum(share.values()) for share in usage.values())
         raise ValueError('Machines exceed the shared module memory, ' + memory_summary(usage, total, limit)) from None
     module, sizes, patch_profile, hooks, stack, usage = check_module(directory, tools, profile, machines)
-    require(provenance(machines) == before, 'Sources changed during compilation')
+    require(provenance(machines, collection_path) == before, 'Sources changed during compilation')
     report = dict(schema=1, target=TARGET, status='experimental-unqualified', sources=before,
                   host=host_platform(), tools=host_pins('tools')[0], compiler=host_pins('compiler')[0],
                   cxx_flags=CXX_FLAGS,
@@ -627,14 +627,14 @@ def prepare_assets(catalog, profile, machines):
     return outputs
 
 
-def verification(stock, catalog, package, toolchain, compiler, *, require_record=True):
-    profile, machines, definitions = configuration()
+def verification(stock, catalog, package, toolchain, compiler, collection_path=None, *, require_record=True):
+    profile, machines, definitions = configuration(collection_path)
     manifest = document(package / 'manifest.json')
     require(manifest.get('schema') == 1 and manifest.get('target') == TARGET, 'Unexpected manifest')
     with tempfile.TemporaryDirectory(prefix='opxy-verify-') as temporary:
         temporary = Path(temporary)
         module, report, patch_profile = compile_collection(temporary, toolchain, compiler, profile, machines,
-                                                           definitions)
+                                                           definitions, collection_path)
         expected_assets = prepare_assets(catalog, profile, machines)
         expected_assets['os.ldr'] = assemble(stock, module, patch_profile, profile, len(profile['patches']),
                                                set(report['services']))
@@ -660,8 +660,8 @@ def verification(stock, catalog, package, toolchain, compiler, *, require_record
     return result
 
 
-def build(out, toolchain, compiler, stock_os, stock_content):
-    profile, machines, definitions = configuration()
+def build(out, toolchain, compiler, stock_os, stock_content, collection_path=None):
+    profile, machines, definitions = configuration(collection_path)
     stock = read(stock_os)
     require(sha(stock) == profile['stock_sha256'], 'Stock OS hash mismatch')
     catalog = read(Path(stock_content) / 'op1_factory.json')
@@ -670,7 +670,7 @@ def build(out, toolchain, compiler, stock_os, stock_content):
     analysis = output / 'analysis'
     analysis.mkdir()
     module, report, patch_profile = compile_collection(analysis, toolchain, compiler, profile, machines,
-                                                       definitions)
+                                                       definitions, collection_path)
     prepared['os.ldr'] = assemble(stock, module, patch_profile, profile, len(profile['patches']),
                                   set(report['services']))
     for name, data in prepared.items():
@@ -680,7 +680,7 @@ def build(out, toolchain, compiler, stock_os, stock_content):
     tracked = ['candidate/' + name for name in prepared] + ['analysis/module.bin', 'analysis/module.elf'] + ANALYSIS
     save_json(output / 'manifest.json', dict(schema=1, target=TARGET,
                                              files={name: sha(read(output / name)) for name in tracked}))
-    result = verification(stock, catalog, output, toolchain, compiler, require_record=False)
+    result = verification(stock, catalog, output, toolchain, compiler, collection_path, require_record=False)
     save_json(output / 'verification.json', result)
     return output, result
 
@@ -697,6 +697,7 @@ def main(argv=None, command=None):
     parser = argparse.ArgumentParser(prog='sdk.py ' + command, description=COMMANDS[command] + ' No device operations.')
     parser.add_argument('--toolchain', type=Path, help='pinned binutils directory (default: local/toolchain/bin)')
     parser.add_argument('--compiler', type=Path, help='pinned Blackfin GCC bundle root (default: local/toolchain)')
+    parser.add_argument('--collection', help='repository-relative .json collection recipe')
     if command == 'verify':
         parser.add_argument('--package', type=Path, required=True)
     else:
@@ -714,13 +715,14 @@ def main(argv=None, command=None):
             require((args.stock_content / 'op1_factory.json').is_file(),
                     f'--stock-content must be the folder holding op1_factory.json '
                     f'(a copy of the device\'s /content): {args.stock_content}')
-        profile, machines, definitions = configuration()
+        profile, machines, definitions = configuration(args.collection)
         tools = resolve_toolchain(args.toolchain, args.compiler)
         tool_paths(tools[0])
         compiler_paths(tools[1])
         if command == 'compile':
             output = fresh_output(args.out)
-            _module, report, _patches = compile_collection(output, *tools, profile, machines, definitions)
+            _module, report, _patches = compile_collection(output, *tools, profile, machines, definitions,
+                                                          args.collection)
             print(json.dumps(report['sizes'], indent=2))
             print('Memory ' + memory_summary(report['memory'], report['sizes']['allocated_span_bytes'],
                                             report['module_bytes']))
@@ -728,9 +730,9 @@ def main(argv=None, command=None):
         elif command == 'verify':
             stock, catalog = read(args.stock_os), read(args.stock_content / 'op1_factory.json')
             require(sha(stock) == profile['stock_sha256'], 'Stock OS hash mismatch')
-            print(json.dumps(verification(stock, catalog, args.package.resolve(), *tools), indent=2))
+            print(json.dumps(verification(stock, catalog, args.package.resolve(), *tools, args.collection), indent=2))
         else:
-            output, result = build(args.out, *tools, args.stock_os, args.stock_content)
+            output, result = build(args.out, *tools, args.stock_os, args.stock_content, args.collection)
             print(json.dumps(result, indent=2))
             print('Local experimental package: ' + str(output))
             candidate = output / 'candidate'

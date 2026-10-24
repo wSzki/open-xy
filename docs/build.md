@@ -67,6 +67,19 @@ this repository uses. To build it for the device:
    ones use most of it; `compile` shows each machine's share. Remove machines
    you don't want to make room.
 
+### Choose a collection
+
+The default is `profiles/collection.json`. To compile, build or verify another
+selection, pass `--collection <path>` with a repository-relative POSIX `.json`
+recipe. It must contain exactly `{"schema": 1, "machines": ["..."]}`; machine
+order in that list determines link and firmware order. Selection does not edit
+the default recipe.
+
+Personal kits accept the same option via `sdk.py kit`. Native qualification
+accepts `--collection <path>` via `sdk.py check` only when all native inputs
+are supplied (`--native-package`, `--stock-os`, `--stock-content` and
+`--toolchain`); a recipe alone does not request native qualification.
+
 `python sdk.py compile --out <folder>` then builds the module alone, without
 stock files, and prints each machine's memory use: a quick check before the
 full build. Like build outputs, keep `<folder>` outside the checkout.

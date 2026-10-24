@@ -49,7 +49,8 @@ class PackageVerification(unittest.TestCase):
         cls.module = read(cls.package / 'analysis/module.bin')
         cls.report = document(cls.package / 'analysis/compile-report.json')
         cls.elf = read(cls.package / 'analysis/module.elf')
-        cls.patch_profile, cls.machines, _definitions = native.configuration()
+        cls.collection_path = os.environ.get('OPXY_TEST_COLLECTION')
+        cls.patch_profile, cls.machines, _definitions = native.configuration(cls.collection_path)
         cls.patch_profile['patches'] = cls.report['patches']
 
     def setUp(self):
@@ -65,7 +66,7 @@ class PackageVerification(unittest.TestCase):
     def verify(self):
         with patch.object(native, 'compile_collection', self.fresh_compile):
             options = [Path('unused-mocked-toolchain')] * 2
-            return native.verification(self.stock, self.catalog, self.copy, *options)
+            return native.verification(self.stock, self.catalog, self.copy, *options, self.collection_path)
 
     def change_hash(self, name):
         manifest = document(self.copy / 'manifest.json')
@@ -106,8 +107,9 @@ class PackageVerification(unittest.TestCase):
         original = json.loads(self.catalog)
         current = json.loads((self.package / 'candidate/content/op1_factory.json').read_bytes())
         names = [m.native_name for m in self.machines if m.kind != 'effect']
-        self.assertEqual(current['engine_types'][:-len(names)], original['engine_types'])
-        self.assertEqual([e['type'] for e in current['engine_types'][-len(names):]], names)
+        stock_count = len(original['engine_types'])
+        self.assertEqual(current['engine_types'][:stock_count], original['engine_types'])
+        self.assertEqual([e['type'] for e in current['engine_types'][stock_count:]], names)
         displays = [m.native_name for m in self.machines if m.display != 'stock']
         files = {p.relative_to(self.package / 'candidate').as_posix()
                  for p in (self.package / 'candidate').rglob('*') if p.is_file()}

@@ -1,4 +1,5 @@
 import argparse
+import json
 import tempfile
 from pathlib import Path
 import unittest
@@ -9,16 +10,23 @@ from unittest.mock import patch
 
 class CheckRunnerTests(unittest.TestCase):
     def options(self, **values):
-        return argparse.Namespace(**{key: values.get(key) for key in (*FIXTURES, 'toolchain')})
+        return argparse.Namespace(**{key: values.get(key) for key in (*FIXTURES, 'toolchain', 'collection')})
 
     def test_public_mode_does_not_silently_use_stale_private_fixtures(self):
-        env, native = fixture_environment(self.options(), {'PATH': 'retained', 'OPXY_TEST_NATIVE_ELF': 'stale'})
+        env, native = fixture_environment(
+            self.options(), {'PATH': 'retained', 'OPXY_TEST_NATIVE_ELF': 'stale',
+                             'OPXY_TEST_COLLECTION': 'stale.json'})
         self.assertEqual(env, {'PATH': 'retained'})
         self.assertFalse(native)
 
     def test_partial_native_inputs_fail_instead_of_falling_back_to_public(self):
         with self.assertRaises(ValueError):
             fixture_environment(self.options(native_package=Path('missing')), {})
+
+    def test_collection_selection_alone_is_not_native_qualification(self):
+        with self.assertRaisesRegex(
+                ValueError, '^Collection selection requires all native qualification inputs$'):
+            fixture_environment(self.options(collection='profiles/collection.json'), {})
 
     def test_native_inputs_must_exist_and_bind_elf_to_package(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -31,8 +39,10 @@ class CheckRunnerTests(unittest.TestCase):
                 file.write_bytes(b'fixture')
             values['toolchain'] = root / 'tools'
             values['toolchain'].mkdir()
+            values['collection'] = 'profiles/collection.json'
             env, native = fixture_environment(self.options(**values), {})
             self.assertTrue(native)
+            self.assertEqual(env['OPXY_TEST_COLLECTION'], 'profiles/collection.json')
             # Hosted Windows runners can expose TEMP through an 8.3 alias.
             self.assertEqual(Path(env['OPXY_TEST_NATIVE_ELF']),
                              (values['native_package'] / 'analysis/module.elf').resolve())

@@ -12,7 +12,7 @@ import re
 
 from .definitions import ANALYSIS_HEAP_LIMIT, ROOT, stock_name, validate_definition
 from .formats import require
-from .pipeline import config
+from .pipeline import child, config
 
 KINDS = ('synth', 'sample', 'effect')
 FIELDS = {'schema', 'kind', 'description', 'identity', 'sources', 'includes', 'icon', 'presetDefaults', 'dryParameter'}
@@ -150,11 +150,30 @@ def free_synth_identity():
     return {'engine': engine, 'page': page}
 
 
-def collection():
+def collection_file(path=None) -> str:
+    """A normalized repository-relative recipe path, defaulting to the bundled collection."""
+    if path is None:
+        path = COLLECTION.relative_to(ROOT).as_posix()
+    elif not isinstance(path, str):
+        raise ValueError('Collection must be a repository-relative .json file')
+    resolved = child(ROOT, path)
+    relative = resolved.relative_to(ROOT.resolve()).as_posix()
+    require(relative.endswith('.json'), 'Collection file must have a .json extension')
+    require(resolved.is_file(), 'Missing collection file: ' + relative)
+    return relative
+
+
+def collection(path=None):
     """Machines in firmware order: the order sets startup, catalog and link layout."""
-    value = json.loads(COLLECTION.read_text(encoding='utf-8'))
+    relative = collection_file(path)
+    value = json.loads(child(ROOT, relative).read_text(encoding='utf-8'))
+    require(isinstance(value, dict) and set(value) == {'schema', 'machines'} and
+            type(value.get('schema')) is int and value['schema'] == 1,
+            'Unsupported collection schema')
     identities = value['machines']
-    require(isinstance(identities, list) and identities and len(set(identities)) == len(identities),
+    require(isinstance(identities, list) and identities and
+            all(isinstance(identity, str) for identity in identities) and
+            len(set(identities)) == len(identities),
             'Collection needs distinct machines')
     machines = [machine(identity) for identity in identities]
     engines = [m.identity['engine'] for m in machines if 'engine' in m.identity]

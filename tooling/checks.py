@@ -7,6 +7,7 @@ import subprocess
 import sys
 import unittest
 from .formats import require
+from .machines import collection_file
 from .pipeline import require_release_host, resolve_toolchain
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,7 +22,10 @@ def fixture_environment(options, inherited):
     # Public CI and a developer's public check must mean the same thing, even
     # when the calling shell retains fixture paths from an earlier experiment.
     env = {k: v for k, v in inherited.items() if not k.startswith('OPXY_TEST_')}
+    collection_path = getattr(options, 'collection', None)
     supplied = [getattr(options, key) for key in (*FIXTURES, 'toolchain')]
+    if collection_path is not None and not any(supplied):
+        raise ValueError('Collection selection requires all native qualification inputs')
     if not any(supplied):
         return env, False
     if not all(supplied):
@@ -36,6 +40,7 @@ def fixture_environment(options, inherited):
     if not Path(options.toolchain).is_dir():
         raise ValueError(f'Missing toolchain directory: {options.toolchain}')
     env['OPXY_TEST_NATIVE_ELF'] = str(Path(env['OPXY_TEST_NATIVE_PACKAGE']) / 'analysis/module.elf')
+    env['OPXY_TEST_COLLECTION'] = collection_file(collection_path)
     return env, True
 
 
@@ -53,6 +58,7 @@ def main(argv=None):
     for name in (*FIXTURES, 'toolchain'):
         parser.add_argument('--' + name.replace('_', '-'), type=Path)
     parser.add_argument('--compiler', type=Path)
+    parser.add_argument('--collection', help='repository-relative .json collection recipe')
     parser.add_argument('--host-cxx', default='g++')
     args = parser.parse_args(argv)
     try:
@@ -78,7 +84,8 @@ def main(argv=None):
             run('Independent native source rebuild and package verification',
                 [sys.executable, ROOT / 'sdk.py', 'verify', '--stock-os', args.stock_os.resolve(),
                  '--stock-content', args.stock_content.resolve(), '--package', args.native_package.resolve(),
-                 '--toolchain', args.toolchain.resolve(), '--compiler', args.compiler.resolve()])
+                 '--toolchain', args.toolchain.resolve(), '--compiler', args.compiler.resolve(),
+                 '--collection', env['OPXY_TEST_COLLECTION']])
         for optimized in (False, True):
             command = [sys.executable, *(['-O'] if optimized else []), '-m',
                        'tooling.checks', '_suite', *(['--require-all'] if native else [])]
