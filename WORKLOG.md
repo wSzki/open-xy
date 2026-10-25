@@ -6,6 +6,28 @@ what happened and where the output landed.
 
 ## 2026-10-25
 
+- Corrected the Rings LCD mapping: Brightness changes string length, not
+  thickness; the constant stroke is 0.4 path units. Structure's tilt is
+  preserved across lengths; Damping selects five shades and Position spaces
+  the strings. `Frame<3,32,3,5>` is 840 B; display state remains 44 B.
+- Shortened the Model readout to `sympat`, preserving enum values and the
+  full `Sympathetic` preset name. Fresh preview
+  `local/rings-preview-20261025-015516` passed SDK preview checks; WASM
+  `0a07541c0bb8c0c2ebd10654c13685c302d71736c2735a713b6aac7c1dd056ba`.
+- Actual browser checks measured local spans 56–110 with unchanged stroke,
+  shade and placement, preserved tilt, and the compact label inside its cell.
+  The refreshed app played C++/WASM audio. A focused regression fails on the
+  prior preview (110 → 110) and passes on the corrected build (56 → 110);
+  the 4,267-frame display smoke and normal/`-O` SDK checks pass (88 Node,
+  120 Python per run, six private skips). Native/release qualification deferred.
+- Rings alone now redraws every animation frame. DSP and output gain are
+  unchanged. This supersedes the earlier audible-window claim: visual decay
+  is a note-event timer, not PCM-synchronized.
+- Evidence under `local/rings-night-001/`: `ui-length-before-after.json`,
+  `ui-length-browser.json`, `ui-length-label-browser.json`,
+  `ui-length-display-smoke.json`, `ui-length-public-check.json`, plus
+  `ui-length-short.png`, `ui-length-long.png` and `ui-sympat-header.png`.
+
 - Traced the reported Rings LCD overlap to authored segment/dial artwork
   combined with the workbench's separate control strip. Chose the existing
   shared drawing API for three note-reactive strings, with names/values above

@@ -352,13 +352,20 @@ preview = loadPreview();
 preview.catch(error => status(`Preview unavailable: ${error.message}`));
 reducedMotion.addEventListener('change', () => draw());
 let lastFrame = 0;
+let lastRingsFrame = 0;
 function animate(time) {
-  if (!document.hidden && time - lastFrame > 32) {
-    const elapsed = Math.min(8192, Math.max(0, Math.round((time - lastFrame) * 1.024)));
-    lastFrame = time;
-    if (analyser && context?.state === 'running') analyser.getFloatTimeDomainData(samples);
-    else samples?.fill(0);
-    if (view === 'waveform' || !reducedMotion.matches) draw(elapsed);
+  if (!document.hidden) {
+    const ringsFrame = isRings && time - lastRingsFrame >= 1;
+    const otherFrame = !isRings && time - lastFrame >= 32;
+    if (ringsFrame || otherFrame) {
+      const previousFrame = isRings ? lastRingsFrame : lastFrame;
+      const elapsed = Math.min(8192, Math.max(0, Math.round((time - previousFrame) * 1.024)));
+      if (isRings) lastRingsFrame = time;
+      else lastFrame = time;
+      if (analyser && context?.state === 'running') analyser.getFloatTimeDomainData(samples);
+      else samples?.fill(0);
+      if (view === 'waveform' || !reducedMotion.matches) draw(elapsed);
+    }
   }
   requestAnimationFrame(animate);
 }

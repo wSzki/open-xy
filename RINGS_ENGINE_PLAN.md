@@ -82,16 +82,16 @@ Use internal excitation, no external audio/CV or strummer/onset detector. The or
 Create three presets with all six fields: `Modal` uses the defaults; `Sympathetic` changes only `model` to 0.5; `Inharmonic` changes only `model` to 1. Use `kind: synth`, machine id/namespace `rings`, engine ID 1 and page 84, after rechecking no newly discovered machine occupies either value before publication. If either is now occupied, stop rather than stealing another registration.
 
 The Rings display uses the shared C++ drawing contract: three solid strings,
-horizontal at Structure 0 and tilting as Structure rises, spaced by Position,
-with Brightness selecting stroke width and Damping the shade from white to
-dark grey through a 15-entry palette (five shades × three widths). Note
-strikes vibrate them across all three models, stable under reduced motion,
-and the visible ring-out stays inside the preview's audible window. It draws
-via `machines/rings/display.h`'s `Frame = opxy::draw::Frame<3, 32, 3, 15>`
-and a 44-byte `DisplayState`; the native display reserves a numeric header
-area and vertex coordinates must stay within the numeric SVG constraints.
-Browser presentation, the monitor-gain protocol and the visible-monitor
-policy are specified in the Rings README.
+horizontal at Structure 0 and tilting as Structure rises, spaced by Position.
+Brightness scales string length (both endpoints symmetrically) without changing
+the constant stroke; Damping selects one of five shades from white to dark
+grey. Note strikes trigger the brief visualization timer across all three
+models; this is not PCM-synchronized and makes no audible ring-out guarantee.
+It draws via `machines/rings/display.h`'s
+`Frame = opxy::draw::Frame<3, 32, 3, 5>` and a 44-byte `DisplayState`; the
+native display reserves a numeric header area and vertex coordinates must stay
+within the numeric SVG constraints. Browser presentation, monitor-gain protocol
+and visible-monitor policy are specified in the Rings README.
 
 ### 6. Implement the integer DSP with a reference-informed sound loop
 

@@ -4,6 +4,11 @@ Newest first. One bullet per landed change; dates are ISO.
 
 ## 2026-10-25
 
+- Corrected Rings Brightness to change string length at a constant thin
+  stroke, reduced Damping's palette to five shades, and shortened the Model
+  readout to `sympat` to fit the bar. Faster redraws are Rings-only; the
+  note-event visualization is not PCM-synchronized. Sound DSP is unchanged.
+
 - Refreshed the Rings LCD UI to three note-reactive strings drawn via the
   shared C++ `Frame<3,32,3,1>` API, with Model/Output alternation in the top
   row; sound engine unchanged.

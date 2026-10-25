@@ -7,7 +7,7 @@
     { "id": "brightness", "label": "Bright", "default": 0.5, "mapping": { "kind": "linear", "minimum": 0, "maximum": 1 }, "display": "percent" },
     { "id": "damping", "label": "Damping", "default": 0.3, "mapping": { "kind": "linear", "minimum": 0, "maximum": 1 }, "display": "percent" },
     { "id": "position", "label": "Position", "default": 0.25, "mapping": { "kind": "linear", "minimum": 0, "maximum": 1 }, "display": "percent" },
-    { "id": "model", "label": "Model", "control": 0, "default": 0, "mapping": { "kind": "enum", "labels": ["modal", "sympath", "inharm"] }, "display": "enum" },
+    { "id": "model", "label": "Model", "control": 0, "default": 0, "mapping": { "kind": "enum", "labels": ["modal", "sympat", "inharm"] }, "display": "enum" },
     { "id": "output", "label": "Output", "control": 1, "default": 0.5, "mapping": { "kind": "enum", "labels": ["out", "mix", "aux"] }, "display": "enum" }
   ],
   "presets": {
@@ -21,6 +21,6 @@
     "voiceCapacity": 256,
     "sharedBytes": 226920,
     "outputPeakQ31": 1073741823,
-    "display": { "kind": "drawing", "stateBytes": 44, "stateAlignment": 4, "paths": 3, "points": 32, "nodes": 3, "palette": 15 }
+    "display": { "kind": "drawing", "stateBytes": 44, "stateAlignment": 4, "paths": 3, "points": 32, "nodes": 3, "palette": 5 }
   }
 }

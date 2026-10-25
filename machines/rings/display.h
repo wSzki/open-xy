@@ -2,9 +2,8 @@
 #include <opxy/draw.hpp>
 
 namespace rings {
-// Three independently mutable strings; matches resources.display.
-// Palette 15 = five Damping shades × three Brightness stroke widths.
-using Frame = opxy::draw::Frame<3, 32, 3, 15>;
+// Palette has five Damping shades; Brightness controls string length.
+using Frame = opxy::draw::Frame<3, 32, 3, 5>;
 struct DisplayState {
     opxy::u32 previous_event;
     opxy::u32 track;

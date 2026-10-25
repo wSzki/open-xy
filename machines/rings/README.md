@@ -33,13 +33,12 @@ third takes the oldest context. Browser preview has eight lightweight voices,
 not eight complete DSP instances.
 ## Display
 
-The display draws three solid strings: horizontal at Structure 0 and tilting
-as Structure rises. Brightness thickens the stroke, Damping shades it from
-white toward dark grey, and Position sets the spacing between the strings.
-Note strikes vibrate them at 12–30 Hz, and the visible ring-out stays inside
-the preview's audible window so the lines stop when the sound stops. Reduced
-motion keeps them stable. This is a string visualization, not an exact PCM
-waveform.
+The display draws three solid strings, horizontal at Structure 0 and tilting
+as Structure rises. Brightness changes their length, not their thin stroke;
+Damping shades them from white toward dark grey, and Position sets their
+spacing. Note strikes trigger brief rapid vibration. The display updates every
+animation frame, but it is a visualization rather than exact PCM or an audible
+sync guarantee. Reduced motion keeps the strings stable.
 
 ## Preview
 

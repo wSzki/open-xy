@@ -63,17 +63,20 @@ inline void set_point(Frame::path_type& path, u32 index, i32 x, i32 y, bool& cha
 }
 
 // One solid stroke per string: horizontal at Structure 0, tilting as Structure
-// rises. Both outline edges share the same points, so the closed strip renders
-// as a single crisp line instead of a blurred double edge.
+// rises. Brightness scales the centered string span in both axes, preserving
+// its tilt. Both outline edges share the same points for one crisp stroke.
 inline void string_path(Frame::path_type& path, u32 string, i32 brightness,
                         u32 peak, i32 amplitude, u32 phase, i32 slope) {
     const u32 old_key = path.key;
     bool changed = old_key == 0;
     const u32 time = (phase + string * 6u) & 63u;
+    const i32 half_length = 28 + brightness * 27 / 1023;
 
     for (u32 sample = 0; sample < 16; ++sample) {
-        const i32 x = -55 * unit + static_cast<i32>(sample * 110u * unit / 15u);
-        const i32 base_y = slope * unit / 2 - slope * static_cast<i32>(unit * sample) / 15;
+        const i32 centered = static_cast<i32>(sample * 2u) - 15;
+        const i32 x = half_length * unit * centered / 15;
+        const i32 base_y = (slope * unit / 2 - slope * static_cast<i32>(unit * sample) / 15) *
+            half_length / 55;
         i32 displacement = 0;
         if (amplitude) {
             const u32 spatial = sample * 64u / 15u;
@@ -125,9 +128,7 @@ inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& 
         state.phase = 0;
     } else if (!input.reduced_motion && state.amplitude) { // Reduced motion holds note state; controls still shape the lines.
         const i32 elapsed = clamp(input.elapsed, 0, expired);
-        // Visible ring-out tracks the preview's audible window (note plus its
-        // 120 ms release tail): about 0.18 s at minimum Damping and 0.6 s at
-        // maximum, so the strings never vibrate after the sound has stopped.
+        // Brief note-triggered decay; this timer-based preview is not PCM.
         const i32 rate = 5700 - ((damping * 4000) >> 10);
         const i32 decay = elapsed * rate + static_cast<i32>(state.decay_remainder);
         const i32 loss = floor_q10(decay);
@@ -139,7 +140,7 @@ inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& 
             state.decay_remainder = 0;
         }
         if (state.amplitude) {
-            const u32 frequency = 12u + (static_cast<u32>(structure) * 18u >> 10); // 12..30 cycles per second.
+            const u32 frequency = 12u + (static_cast<u32>(structure) * 12u >> 10); // 12..24 cycles per second.
             state.phase = (state.phase + static_cast<u32>(elapsed) * frequency) & 1023u;
         }
     }
@@ -156,8 +157,8 @@ inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& 
     // Structure tilts the strings from horizontal; Position spaces the group.
     const i32 slope = static_cast<i32>(static_cast<u32>(structure) * 40u >> 10);
     const i32 gap = 18 + static_cast<i32>(static_cast<u32>(position) * 28u >> 10);
-    // Damping shades the stroke from white to dark grey; Brightness thickens it.
-    const u32 shade = ((static_cast<u32>(damping) * 5u >> 10) * 3u) + (static_cast<u32>(brightness) * 3u >> 10);
+    // Damping shades the stroke from white to dark grey; Brightness lengthens it.
+    const u32 shade = static_cast<u32>(damping) * 5u >> 10;
     // Position selects a triangular pluck profile between interior samples 2..13.
     const u32 peak = state.amplitude ? 2u + (static_cast<u32>(position) * 12u >> 10) : 0;
     const u32 wave_phase = state.amplitude ? state.phase >> 4 : 0;
