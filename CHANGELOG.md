@@ -3,6 +3,9 @@
 Newest first. One bullet per landed change; dates are ISO.
 
 ## 2026-10-25
+- Shifted only the Rings browser drawing vertically so native y=120 maps to
+  y=122, centring it in the visible body below the header; other geometry and
+  spacing are unchanged.
 - Reversed the Rings Damping palette so dark grey is shown at 0 and white
   toward 100; stroke geometry, animation and DSP are unchanged.
 

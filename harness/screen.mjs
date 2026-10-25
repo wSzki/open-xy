@@ -16,7 +16,8 @@ export function renderScreen(values, view, samples = null, graphics = '', contro
   } else {
     // Only the browser page's header/footer placement differs from stock.
     // All instrument geometry, paint and animation arrive from shared C++.
-    const transform = rings ? 'translate(0 26) scale(1 .88)'
+    // Native y=120 maps to y=122, the centre of the visible 20–224 body.
+    const transform = rings ? 'translate(0 16.4) scale(1 .88)'
       : segmented ? 'translate(60 20) scale(.75)' : 'translate(0 -15)';
     drawing = graphics ? `<g transform="${transform}">${graphics}</g>`
       : '<text x="240" y="110" text-anchor="middle" font-size="12">Build and load the C++ preview to see the instrument.</text>';

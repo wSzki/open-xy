@@ -6,6 +6,15 @@ what happened and where the output landed.
 
 ## 2026-10-25
 
+- Shifted only the Rings browser drawing vertically so native y=120 maps to
+  y=122, the centre of its visible y=20–224 body beneath the header. Other
+  geometry and spacing are unchanged. Actual browser checks confirm equal top
+  and bottom padding at all eight Structure/Brightness/Position corner
+  combinations, and on mobile (maximum discrepancy below 0.00003 SVG units).
+  SDK public checks pass (88 Node; 120 Python normal/`-O`, six private skips).
+  Evidence: `local/rings-night-001/ui-center-browser.json`,
+  `ui-center-check.json` and `ui-center-desktop.png`. Existing servers serve
+  the corrected browser source; no C++/WASM or sound changes were needed.
 - Reversed only the Rings Damping display palette: dark grey at 0 toward white
   at 100. Updated the current display documentation and corrected the plan's
   Model label to `sympat`; stroke geometry, animation and DSP are unchanged.
