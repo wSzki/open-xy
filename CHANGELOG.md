@@ -4,6 +4,10 @@ Newest first. One bullet per landed change; dates are ISO.
 
 ## 2026-10-25
 
+- Increased the three Rings string strokes and five Damping swatches to 0.8
+  path units; lightened the Damping palette from white `#F4F6F6` to `#899393`.
+  The initial string stroke remains white. No DSP, geometry, or timing changes.
+
 - Corrected Rings Brightness to change string length at a constant thin
   stroke, reduced Damping's palette to five shades, and shortened the Model
   readout to `sympat` to fit the bar. Faster redraws are Rings-only; the

@@ -6,6 +6,17 @@ what happened and where the output landed.
 
 ## 2026-10-25
 
+- Increased all three Rings string strokes and all five Damping palette swatches
+  to 0.8 path units. Lightened the five Damping colors from white `#F4F6F6`
+  through `#D9DEDE`, `#BEC6C6`, and `#A3ADAD` to `#899393`; the initial string
+  stroke remains white. No DSP, geometry, or timing changes.
+- Fresh preview `local/rings-preview-20261025-020622` passes the SDK preview
+  smoke and public checks (88 Node; 120 Python normal/`-O`, six private skips).
+  Actual browser inspection confirms all three strokes at 0.8, maximum Damping
+  at `#899393`, and unchanged resting geometry. Evidence:
+  `local/rings-night-001/ui-visibility-{build,check,browser}.json` and
+  `ui-visibility-damping-max.png`. Existing browser URLs refreshed.
+
 - Corrected the Rings LCD mapping: Brightness changes string length, not
   thickness; the constant stroke is 0.4 path units. Structure's tilt is
   preserved across lengths; Damping selects five shades and Position spaces
