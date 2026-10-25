@@ -3,6 +3,8 @@
 Newest first. One bullet per landed change; dates are ISO.
 
 ## 2026-10-25
+- Reversed the Rings Damping palette so dark grey is shown at 0 and white
+  toward 100; stroke geometry, animation and DSP are unchanged.
 
 - Increased the three Rings string strokes and five Damping swatches to 0.8
   path units; lightened the Damping palette from white `#F4F6F6` to `#899393`.

@@ -157,7 +157,7 @@ inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& 
     // Structure tilts the strings from horizontal; Position spaces the group.
     const i32 slope = static_cast<i32>(static_cast<u32>(structure) * 40u >> 10);
     const i32 gap = 18 + static_cast<i32>(static_cast<u32>(position) * 28u >> 10);
-    // Damping shades the stroke from white to dark grey; Brightness lengthens it.
+    // Damping shades the stroke from dark grey at 0 toward white at 100; Brightness lengthens it.
     const u32 shade = static_cast<u32>(damping) * 5u >> 10;
     // Position selects a triangular pluck profile between interior samples 2..13.
     const u32 peak = state.amplitude ? 2u + (static_cast<u32>(position) * 12u >> 10) : 0;

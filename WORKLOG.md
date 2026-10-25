@@ -6,6 +6,15 @@ what happened and where the output landed.
 
 ## 2026-10-25
 
+- Reversed only the Rings Damping display palette: dark grey at 0 toward white
+  at 100. Updated the current display documentation and corrected the plan's
+  Model label to `sympat`; stroke geometry, animation and DSP are unchanged.
+  Fresh preview `local/rings-preview-20261025-021307` passes SDK preview and
+  public checks (88 Node; 120 Python normal/`-O`, six private skips). The actual
+  browser confirms all five shades progress dark-to-light, with the 0.8 stroke
+  and resting geometry unchanged; WASM identity is unchanged. Evidence:
+  `local/rings-night-001/ui-invert-{build,check,browser}.json` and
+  `ui-invert-min.png` / `ui-invert-max.png`. Browser URLs refreshed.
 - Increased all three Rings string strokes and all five Damping palette swatches
   to 0.8 path units. Lightened the five Damping colors from white `#F4F6F6`
   through `#D9DEDE`, `#BEC6C6`, and `#A3ADAD` to `#899393`; the initial string

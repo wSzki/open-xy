@@ -72,7 +72,7 @@ Define six parameters in this exact order; amount mappings are linear [0,1] with
 | 1 | `brightness` / `Bright` | 0.5 | Primary 1 |
 | 2 | `damping` / `Damping` | 0.3 | Primary 2 |
 | 3 | `position` / `Position` | 0.25 | Primary 3 |
-| 4 | `model` / `Model` | 0 | Alternate `control: 0`; `modal`, `sympath`, `inharm` |
+| 4 | `model` / `Model` | 0 | Alternate `control: 0`; `modal`, `sympat`, `inharm` |
 | 5 | `output` / `Output` | 0.5 | Alternate `control: 1`; `out`, `mix`, `aux` |
 
 Use the SDK's Q31-to-Q15 enum quantization, matching `machines/macroosc/display.cpp:35–38`, not floating-point rounding. Default output is Mix: `0.25 * (out + aux)` after the upstream limiter; Out and Aux are `0.5 * out` and `0.5 * aux`. Clamp the final Q31 buffer to `[-1073741823, 1073741823]` and declare `outputPeakQ31: 1073741823`. Do not silently discard half the modal bank by making Out-only the default.
@@ -84,10 +84,10 @@ Create three presets with all six fields: `Modal` uses the defaults; `Sympatheti
 The Rings display uses the shared C++ drawing contract: three solid strings,
 horizontal at Structure 0 and tilting as Structure rises, spaced by Position.
 Brightness scales string length (both endpoints symmetrically) without changing
-the constant stroke; Damping selects one of five shades from white to dark
-grey. Note strikes trigger the brief visualization timer across all three
-models; this is not PCM-synchronized and makes no audible ring-out guarantee.
-It draws via `machines/rings/display.h`'s
+the constant stroke; Damping selects one of five shades from dark grey at 0
+toward white at 100. Note strikes trigger the brief visualization timer across
+all three models; this is not PCM-synchronized and makes no audible ring-out
+guarantee. It draws via `machines/rings/display.h`'s
 `Frame = opxy::draw::Frame<3, 32, 3, 5>` and a 44-byte `DisplayState`; the
 native display reserves a numeric header area and vertex coordinates must stay
 within the numeric SVG constraints. Browser presentation, monitor-gain protocol

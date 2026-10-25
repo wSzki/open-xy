@@ -35,10 +35,10 @@ not eight complete DSP instances.
 
 The display draws three solid strings, horizontal at Structure 0 and tilting
 as Structure rises. Brightness changes their length, not their thin stroke;
-Damping shades them from white toward dark grey, and Position sets their
-spacing. Note strikes trigger brief rapid vibration. The display updates every
-animation frame, but it is a visualization rather than exact PCM or an audible
-sync guarantee. Reduced motion keeps the strings stable.
+Damping shades them from dark grey at 0 toward white at 100, and Position sets
+their spacing. Note strikes trigger brief rapid vibration. The display updates
+every animation frame, but it is a visualization rather than exact PCM or an
+audible sync guarantee. Reduced motion keeps the strings stable.
 
 ## Preview
 
